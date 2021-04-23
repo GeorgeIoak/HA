@@ -1,0 +1,89 @@
+- platform: mqtt
+  name: "Kitchen Table Light"
+  state_topic: "smartthings/Kitchen Table Light/switch/state"
+  command_topic: "smartthings/Kitchen Table Light/switch"
+  retain: true
+  brightness_state_topic: "smartthings/Kitchen Table Light/level"
+  brightness_command_topic: "smartthings/Kitchen Table Light/level"
+  brightness_scale: 99
+  brightness_value_template: "{{ value }}"
+  qos: 0
+  payload_on: "on"
+  payload_off: "off"
+
+- platform: mqtt
+  name: "Front Room Light Switch"
+  state_topic: "stat/front-room_light_switch/POWER"
+  command_topic: "cmnd/front-room_light_switch/POWER"
+  availability_topic: "tele/front-room_light_switch/LWT"
+  brightness_state_topic: "stat/front-room_light_switch/RESULT"
+  brightness_command_topic: "cmnd/front-room_light_switch/Dimmer"
+  brightness_scale: 100
+  brightness_value_template: "{{ value_json.Dimmer }}"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: false
+
+- platform: mqtt
+  name: "2nd Set of Overhead Garage Lights"
+  state_topic: "stat/2ndGarageLights/RESULT"
+  #value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/2ndGarageLights/POWER"
+  availability_topic: "tele/2ndGarageLights/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: false
+
+- platform: mqtt
+  name: "Front Landscape Lighting"
+  state_topic: "stat/FrontLandscapeLights/RESULT"
+  #value_template: "{{ value_json.POWER }}"
+  command_topic: "cmnd/FrontLandscapeLights/POWER"
+  availability_topic: "tele/FrontLandscapeLights/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: false
+
+- platform: mqtt
+  name: Garage Status Light
+  effect_list:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+  state_topic: "cmnd/Garage_AFS/power5"
+  command_topic: "cmnd/Garage_AFS/power5"
+  brightness_state_topic: "cmnd/Garage_AFS/Dimmer"
+  brightness_command_topic: "cmnd/Garage_AFS/Dimmer"
+  brightness_scale: 100
+  rgb_command_template: "{{ '%02x%02x%02x' | format(red, green, blue)}}"
+  rgb_state_topic: "cmnd/Garage_AFS/Color"
+  rgb_command_topic: "cmnd/Garage_AFS/Color"
+  effect_command_topic: "cmnd/Garage_AFS/Scheme"
+  effect_state_topic: "cmnd/Garage_AFS/Scheme"
+  state_value_template: "{{ value }}"
+  brightness_value_template: "{{ value }}"
+  effect_value_template: "{{ value }}"
+  #rgb_command_mode: hex #191214 command not supported anymore
+  retain: false
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"

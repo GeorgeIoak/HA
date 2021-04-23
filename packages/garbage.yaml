@@ -1,0 +1,12 @@
+garbage_collection:
+  sensors:
+    - name: "Garbage"
+      frequency: "weekly"
+      collection_days: "mon"
+    - name: "Green"
+      frequency: "even-weeks"
+      collection_days: "mon"
+    - name: "Recycling"
+      frequency: "odd-weeks"
+      collection_days: "mon"
+      verbose_state: True

@@ -1,0 +1,72 @@
+id: testing06
+title: Testing06
+path: testing06
+panel: true
+cards:
+  - type: vertical-stack
+    cards:
+      - type: entities
+        title: Light        
+        entities:
+          - light.front_room_light_switch
+          - light.kitchen_table_light
+          - light.garage_status_light
+          - light.wled
+      - type: entities
+        title: Garage AFS
+        show_header_toggle: false
+        entities:
+        ## USE THIS CONFIG TO HAVE IT MATCH YOUR THEME ##
+          - entity: switch.garage_fan
+          - entity: fan.garage_afs
+            type: custom:fan-control-entity-row
+            name: Garage Air Filter
+            customTheme: false
+      - type: horizontal-stack
+        cards:
+        - type: "custom:button-card"
+          color_type: blank-card
+        - type: "custom:button-card"
+          name: 30
+          entity: input_boolean.timer_30min
+          icon: mdi:checkbox-blank-circle
+          color: rgb(25, 155, 20)
+          tap_action:
+            action: call-service
+            service: script.garage_afs_off
+          styles:
+            card:
+              - height: 40px
+              - width: 40px
+          state:
+            - value: "off"
+              icon: mdi:checkbox-blank-circle-outline
+              color: rgb(61,61,61)  
+        - type: "custom:button-card"
+          name: 60
+          entity: input_boolean.timer_60min
+          icon: mdi:checkbox-blank-circle
+          color: rgb(25, 155, 20)
+          styles:
+            card:
+              - height: 40px
+              - width: 40px
+          state:
+            - value: "off"
+              icon: mdi:checkbox-blank-circle-outline
+              color: rgb(61,61,61)
+        - type: "custom:button-card"
+          name: 90
+          entity: input_boolean.timer_90min
+          icon: mdi:checkbox-blank-circle
+          color: rgb(25, 155, 20)
+          styles:
+            card:
+              - height: 40px
+              - width: 40px
+          state:
+            - value: "off"
+              icon: mdi:checkbox-blank-circle-outline
+              color: rgb(61,61,61)
+        - type: "custom:button-card"
+          color_type: blank-card

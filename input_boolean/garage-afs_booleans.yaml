@@ -1,0 +1,14 @@
+timer_30min:
+  name: 30min
+  icon: mdi:timer
+  initial: off
+
+timer_60min:
+  name: 60min
+  icon: mdi:timer
+  initial: off
+
+timer_90min:
+  name: 90min
+  icon: mdi:timer
+  initial: off

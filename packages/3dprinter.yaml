@@ -1,0 +1,67 @@
+homeassistant:
+  customize:
+    binary_sensor.octoprint_printing:
+      friendly_name: "3D Printer State"
+      icon: mdi:printer-3d
+    binary_sensor.octoprint_printing_error:
+      friendly_name: Error
+      icon: mdi:alert-circle
+    sensor.octoprint_current_state:
+      friendly_name: "Status"
+      icon: mdi:printer-3d
+    sensor.octoprint_job_percentage:
+      friendly_name: "Job %"
+      icon: mdi:percent
+    sensor.octoprint_target_tool0_temp:
+      friendly_name: "Hotend (Target)"
+      icon: mdi:temperature-celsius
+      unit_of_measurement: C
+    sensor.octoprint_target_bed_temp:
+      friendly_name: "Bed (Target)"
+      icon: mdi:vector-square
+      unit_of_measurement: C
+    sensor.octoprint_actual_bed_temp:
+      friendly_name: "Bed (Actual)"
+      icon: mdi:vector-square
+      unit_of_measurement: C
+    sensor.octoprint_actual_tool0_temp:
+      friendly_name: "Hotend (Actual)"
+      icon: mdi:temperature-celsius
+      unit_of_measurement: C
+    sensor.octoprint_time_elapsed_friendly:
+      icon: mdi:clock-start
+    sensor.octoprint_time_remaining_friendly:
+      icon: mdi:clock-end
+
+octoprint:
+  host: octopi.local
+  api_key: !secret octopi_key
+  number_of_tools: 1
+  bed: True
+  sensors:
+    monitored_conditions:
+      - "Current State"
+      - "Temperatures"
+      - "Job Percentage"
+      - "Time Elapsed"
+      - "Time Remaining"
+  binary_sensors:
+    monitored_conditions:
+      - "Printing"
+      - "Printing Error"
+
+camera:
+  - platform: mjpeg
+    name: OctoPrint
+    still_image_url: http://octopi.local/webcam/?action=snapshot
+    mjpeg_url: http://octopi.local/webcam/?action=stream
+
+sensor:
+  - platform: template
+    sensors:
+      octoprint_time_elapsed_friendly:
+        friendly_name: "Ender 3 Time Elapsed"
+        value_template: "{{ states('sensor.octoprint_time_elapsed') | int | timestamp_custom('%H:%M:%S', 0) }}"
+      octoprint_time_remaining_friendly:
+        friendly_name: "Ender 3 Time Remaining"
+        value_template: "{{ states('sensor.octoprint_time_remaining') | int | timestamp_custom('%H:%M:%S', 0) }}"

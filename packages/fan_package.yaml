@@ -1,0 +1,331 @@
+fan:
+  - platform: template
+    fans:
+      garage_afs:
+        friendly_name: "Garage AFS"
+        value_template: "{{ states('input_boolean.garage_afs_state') }}"
+        speed_template: "{{ states('input_select.garage_afs_fan_speed') }}"
+        turn_on:
+          service: script.garage_afs_on
+        turn_off:
+          service: script.garage_afs_off
+        set_speed:
+          service: script.garage_afs_fan_set_speed
+          data_template:
+            speed: "{{ speed }}"
+        speeds:
+          - off
+          - low
+          - medium
+          - high
+
+input_select:
+  garage_afs_fan_speed:
+    name: Garage AFS Fan Speeds
+    options:
+      - "off"
+      - "low"
+      - "medium"
+      - "high"
+    initial: "off"
+
+  fan_time_select:
+    name: Garage Fan Turn Off Time Minutes
+    options:
+      - "OFF"
+      - "30"
+      - "60"
+      - "90"
+    icon: mdi:timer
+    initial: "OFF"
+
+timer:
+  garage_afs:
+    duration: "00:30:00"
+
+input_boolean:
+  garage_afs_state:
+    name: Garage AFS State
+
+group:
+  garage_afs:
+    name: "Garage AFS"
+    entities:
+      - input_boolean.timer_30min
+      - input_boolean.timer_60min
+      - input_boolean.timer_90min
+
+script:
+  garage_afs_off:
+    alias: Garage AFS Off
+    sequence:
+      - service: automation.trigger
+        entity_id: automation.afs_off
+      - service: input_boolean.turn_off
+        data:
+          entity_id: input_boolean.garage_afs_state
+
+  garage_afs_on:
+    alias: Garage AFS On
+    sequence:
+      - service: input_boolean.turn_on
+        data:
+          entity_id: input_boolean.garage_afs_state
+      #- service_template: >
+      - service: >
+          {% if is_state("input_select.garage_afs_fan_speed", "low") %}
+            script.garage_afs_fan_low
+          {% elif is_state("input_select.garage_afs_fan_speed", "medium") %}
+            script.garage_afs_fan_med
+          {% elif is_state("input_select.garage_afs_fan_speed", "high") %}
+            script.garage_afs_fan_high
+          {% endif %}
+
+  garage_afs_fan_set_speed:
+    alias: Garage AFS Set Speed
+    sequence:
+      - service: input_select.select_option
+        data_template:
+          entity_id: input_select.garage_afs_fan_speed
+          option: "{{ speed }}"
+      - delay:
+          milliseconds: 500
+      - service: script.turn_on
+        entity_id: script.garage_afs_on
+
+  garage_afs_fan_low:
+    alias: Garage AFS Fan Low
+    sequence:
+      - service: automation.trigger
+        entity_id: automation.afs_low_speed
+
+  garage_afs_fan_med:
+    alias: Garage AFS Fan Medium
+    sequence:
+      - service: automation.trigger
+        entity_id: automation.afs_medium_speed
+
+  garage_afs_fan_high:
+    alias: Garage AFS Fan High
+    sequence:
+      - service: automation.trigger
+        entity_id: automation.afs_high_speed
+
+  dummy:
+    alias: Needed for blank else statements
+    sequence: []
+
+switch:
+  - platform: mqtt
+    name: "GarageAFS Low Speed"
+    state_topic: "stat/Garage_AFS/POWER1"
+    command_topic: "cmnd/Garage_AFS/POWER1"
+    availability_topic: "tele/Garage_AFS/LWT"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    retain: true
+
+  - platform: mqtt
+    name: "GarageAFS Medium Speed"
+    state_topic: "stat/Garage_AFS/POWER2"
+    command_topic: "cmnd/Garage_AFS/POWER2"
+    availability_topic: "tele/Garage_AFS/LWT"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    retain: true
+
+  - platform: mqtt
+    name: "GarageAFS High Speed"
+    state_topic: "stat/Garage_AFS/POWER3"
+    command_topic: "cmnd/Garage_AFS/POWER3"
+    availability_topic: "tele/Garage_AFS/LWT"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    retain: true
+
+automation:
+  - alias: AFS Off
+    trigger:
+      platform: state
+      entity_id:
+        - input_select.afs_speed
+      to: "off"
+    action:
+      - service: switch.turn_off
+        entity_id:
+          - switch.garageafs_low_speed
+          - switch.garageafs_medium_speed
+          - switch.garageafs_high_speed
+          #- switch.garage_fan
+      - service: light.turn_off
+        entity_id:
+          - light.garage_status_light
+
+  - alias: AFS Low Speed
+    trigger:
+      platform: state
+      entity_id:
+        - input_select.afs_speed
+      to: "LOW"
+    action:
+      - service: switch.turn_off
+        entity_id:
+          - switch.garageafs_low_speed
+          - switch.garageafs_medium_speed
+          - switch.garageafs_high_speed
+      - delay: 0:00:03
+      - service: switch.turn_on
+        entity_id:
+          - switch.garageafs_low_speed
+      - service: light.turn_on
+        entity_id:
+          - light.garage_status_light
+      - service: mqtt.publish
+        data_template:
+          topic: "cmnd/Garage_AFS/pixels"
+          retain: "false"
+          payload: 2
+
+  - alias: AFS Medium Speed
+    trigger:
+      platform: state
+      entity_id:
+        - input_select.afs_speed
+      to: "MEDIUM"
+    action:
+      - service: switch.turn_off
+        entity_id:
+          - switch.garageafs_low_speed
+          - switch.garageafs_medium_speed
+          - switch.garageafs_high_speed
+      - delay: 0:00:03
+      - service: switch.turn_on
+        entity_id:
+          - switch.garageafs_medium_speed
+          - switch.garage_fan
+      - service: light.turn_on
+        entity_id:
+          - light.garage_status_light
+      - service: mqtt.publish
+        data_template:
+          topic: "cmnd/Garage_AFS/pixels"
+          retain: "false"
+          payload: 4
+
+  - alias: AFS High Speed
+    trigger:
+      platform: state
+      entity_id:
+        - input_select.afs_speed
+      to: "HIGH"
+    action:
+      - service: switch.turn_off
+        entity_id:
+          - switch.garageafs_low_speed
+          - switch.garageafs_medium_speed
+          - switch.garageafs_high_speed
+      - delay: 0:00:03
+      - service: switch.turn_on
+        entity_id:
+          - switch.garageafs_high_speed
+          - switch.garage_fan
+      - service: light.turn_on
+        entity_id:
+          - light.garage_status_light
+      - service: mqtt.publish
+        data_template:
+          topic: "cmnd/Garage_AFS/pixels"
+          retain: "false"
+          payload: 8
+
+  #From Jim O'Connor, https://community.home-assistant.io/t/button-options-for-timer-duration/171039/3
+  - alias: Update Fan Timer
+    trigger:
+      # Trigger whenever the input_select changes from OFF.
+      platform: state
+      entity_id: input_select.fan_time_select
+      from: "OFF"
+    # condition:
+    #   condition: template
+    #   # Ignore state changes to '0', or 'OFF', or whatever we want to set the off state.
+    #   value_template: "{{ not is_state('input_select.fan_time_select', 'OFF') }}"
+    action:
+      - service: input_boolean.toggle
+        data_template:
+          entity_id: "input_boolean.timer_{{ states('input_select.fan_time_select') }}min"
+      #- service_template: "input_boolean.turn_off"
+      - service: "input_boolean.turn_off"
+        data_template:
+          entity_id: >
+            {% set entities = ["input_boolean.timer_30min", "input_boolean.timer_60min", "input_boolean.timer_90min"] %}
+            {{ entities |reject("equalto", "input_boolean.timer_" + states('input_select.fan_time_select') + "min")|join(',') }}
+      # - service: timer.start
+      #   data_template:
+      #     entity_id: timer.garage_afs
+      #     duration: "00:{{ states('input_select.fan_time_select') }}:00"
+      #- service_template: >
+      - service: >
+          {% if is_state('group.garage_afs', 'on') %}
+          timer.start
+          {% else %}
+          script.dummy
+          {% endif %}
+        data_template:
+          entity_id: timer.garage_afs
+          duration: "00:{{ states('input_select.fan_time_select') }}:00"
+      #- service_template: >
+      - service: >
+          {% if is_state('group.garage_afs', 'off') %}
+          timer.cancel
+          {% else %}
+          script.dummy
+          {% endif %}
+        data_template:
+          entity_id: timer.garage_afs
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.fan_time_select
+          option: "OFF"
+      # - service: timer.pause
+      #   entity_id: timer.garage_afs
+      # - condition: template
+      #   value_template: "{{ is_state('group.garage_afs', 'off') }}"
+
+  - alias: Fan Timer Expired
+    trigger:
+      # Turns off the fan only when timer expires normally or is cancelled.
+      - platform: event
+        event_type: timer.finished
+        event_data:
+          entity_id: timer.garage_afs
+      - platform: event
+        event_type: timer.cancelled
+        event_data:
+          entity_id: timer.garage_afs
+    action:
+      - service: script.turn_on #Need to run the script
+        entity_id: script.garage_afs_off
+      # Now that fan is off, reset the timer button states to off.
+      # - service: input_boolean.turn_off
+      #   entity_id:
+      #     - input_boolean.timer_30min
+      #     - input_boolean.timer_60min
+      #     - input_boolean.timer_90min
+      - service: homeassistant.turn_off #Need to test this to see if it works
+        entity_id: group.garage_afs
+        # data_template:
+        #   entity_id: "input_boolean.timer_{{ states('input_select.fan_time_select') }}min"
+      # Now that fan is off, reset the select to 'off' position.
+      - service: input_select.select_option
+        data:
+          entity_id: input_select.fan_time_select
+          option: "OFF"

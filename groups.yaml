@@ -1,0 +1,15 @@
+#Completely changed from old method, should be able to delete these
+# garage_afs:
+#   name: Jet Air Filtration Unit
+#   control: hidden
+#   entities:
+#     - switch.Garage_AFS_power_1
+#     - switch.Garage_AFS_power_2
+#     - switch.Garage_AFS_power_3
+#     - switch.Garage_AFS_power_4
+
+# jet_speed_control:
+#   name: Jet AFS Speed
+#   control: hidden
+#   entities:
+#     - input_select.afs_speed
