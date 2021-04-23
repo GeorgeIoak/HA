@@ -1,0 +1,121 @@
+- alias: Tasmota SO Push
+  initial_state: false
+  trigger:
+    platform: homeassistant
+    event: start
+  action:
+    - service: mqtt.publish
+      data:
+        topic: cmnd/sonoffs/backlog
+        payload: setoption56 1 ; setoption57 1 ; setoption65 1
+    - service: mqtt.publish
+      data:
+        topic: cmnd/tasmotas/backlog
+        payload: setoption56 1 ; setoption57 1 ; setoption65 1
+  id: d5782c25fcff4d8eb92e8d8a25b791dd
+- alias: Landscape Lighting ON
+  trigger:
+    platform: numeric_state
+    entity_id: sun.sun
+    value_template: "{{ state_attr('sun.sun', 'elevation') }}"
+    below: 3.5
+  action:
+    service: light.turn_on
+    entity_id:
+      - light.front_landscape_lighting
+      - light.wled
+      - light.front_of_the_house
+  id: e08d101efbff45138ab1f683bc27003c
+- alias: Landscape Lighting OFF
+  trigger:
+    platform: numeric_state
+    entity_id: sun.sun
+    value_template: "{{ state_attr('sun.sun', 'elevation') }}"
+    above: -10
+  action:
+    service: light.turn_off
+    entity_id:
+      - light.front_landscape_lighting
+      - light.front_of_the_house
+  id: 1c1ef79f3ada4adaa8b632c0e6193eee
+- id: "1601758186896"
+  alias: Doorbell Rang
+  description: When the Amcrest front doorbell button is pushed have an Alexa announcement
+  trigger:
+    - platform: mqtt
+      topic: homeassistant/Doorbell/button
+      payload: "on"
+  condition: []
+  action:
+    - service: notify.alexa_media
+      data:
+        target:
+          - media_player.kitchen_echo_show
+          - media_player.george_s_echo_show
+        data:
+          type: announce
+        message: Someone is at the front door!
+    - service: camera.snapshot
+      entity_id: camera.doorbell
+      data:
+        entity_id: camera.doorbell
+        filename: /media/snapshot_doorbell_{{ now().strftime("%Y-%m-%d.%H.%M") }}.jpg
+  mode: single
+- id: "1607539984638"
+  alias: turn off wled at night
+  description: ""
+  trigger:
+    - platform: time
+      at: "22:30:00"
+  condition: []
+  action:
+    - domain: light
+      entity_id: light.wled
+      device_id: 90ae17da521e46a48b6d378cc1810cca
+      type: turn_off
+  mode: single
+- id: "1618450524880"
+  alias: Dim Front Door Light
+  description: ""
+  trigger:
+    - platform: time
+      at: "22:30:00"
+  condition: []
+  action:
+    - type: turn_on
+      device_id: cc24df0b7eaa42d893bdd05aa452a8a5
+      entity_id: light.front_door
+      domain: light
+      data:
+        brightness_pct: 20
+  mode: single
+- alias:
+    Update OpenUV every 20 minutes while the sun is at least 10 degrees above
+    the horizon
+  trigger:
+    platform: time_pattern
+    minutes: /20
+  condition:
+    condition: numeric_state
+    entity_id: sun.sun
+    value_template: "{{ state.attributes.elevation }}"
+    above: 10
+  action:
+    service: openuv.update_uv_index_data
+  id: 239d893766404e2785e1cec63ff3d02e
+- id: "1619110269701"
+  alias: "Update UV Protection Data "
+  description: Update the UV data a few times per day
+  trigger:
+    - platform: time_pattern
+      hours: "3"
+      minutes: "1"
+      seconds: "10"
+  condition:
+    - condition: sun
+      before: sunset
+      after: sunrise
+  action:
+    - service: openuv.update_data
+      data: {}
+  mode: single

@@ -1,0 +1,168 @@
+title: My Home
+resources:
+  #- url: /community/fan-control-entity-row/fan-control-entity-row.js
+  - url: /hacsfiles/stack-in-card/stack-in-card.js
+    type: module
+  - url: /hacsfiles/fan-control-entity-row/fan-control-entity-row.js
+    type: module
+  - url: /hacsfiles/garbage-collection-card/garbage-collection-card.js
+    type: module
+  - url: /hacsfiles/simple-weather-card/simple-weather-card-bundle.js
+    type: module
+  - url: /hacsfiles/weather-card/weather-card.js
+    type: module
+  - url: /hacsfiles/button-card/button-card.js
+    type: module
+  #- url: /hacsfiles/button-entity-row/button-entity-row.js
+  #  type: module
+  - url: /hacsfiles/vertical-stack-in-card/vertical-stack-in-card.js
+    type: module
+
+views:
+  - path: theHouse
+    title: Home
+    id: home
+    icon: mdi:home-assistant
+    badges:
+      - entity: binary_sensor.updater
+      - entity: person.george_ioakimedes
+      - entity: sensor.garage_temperature
+      - entity: sensor.garage_humidity
+      - entity: sensor.garage_pressure
+      - entity: sensor.current_uv_index
+      - entity: sensor.current_ozone_level
+      - entity: binary_sensor.protection_window
+      #- entity: sensor.wled_estimated_current
+      #- entity: sensor.wled_uptime
+      #- entity: sensor.pi_hole_ads_percentage_blocked_today
+      #- entity: sensor.wled_free_memory
+      - entity: sun.sun
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: entities
+            title: Light
+            entities:
+              - light.front_room_light_switch
+              - light.kitchen_table_light
+              - light.garage_status_light
+              - light.2nd_set_of_overhead_garage_lights
+              - light.front_landscape_lighting
+              - light.wled
+          - type: entities
+            title: Garage AFS
+            show_header_toggle: false
+            entities:
+              ## USE THIS CONFIG TO HAVE IT MATCH YOUR THEME ##
+              - entity: fan.garage_afs
+                type: custom:fan-control-entity-row
+                name: Garage Air Filter
+                customTheme: false
+              - entity: switch.garage_fan
+          - type: horizontal-stack
+            cards:
+              - type: "custom:button-card"
+                color_type: blank-card
+              - type: "custom:button-card"
+                name: 30
+                entity: input_boolean.timer_30min
+                icon: mdi:checkbox-blank-circle
+                color: rgb(25, 155, 20)
+                tap_action:
+                  action: call-service
+                  service: script.garage_afs_off
+                styles:
+                  card:
+                    - height: 40px
+                    - width: 40px
+                state:
+                  - value: "off"
+                    icon: mdi:checkbox-blank-circle-outline
+                    color: rgb(61,61,61)
+              - type: "custom:button-card"
+                name: 60
+                entity: input_boolean.timer_60min
+                icon: mdi:checkbox-blank-circle
+                color: rgb(25, 155, 20)
+                styles:
+                  card:
+                    - height: 40px
+                    - width: 40px
+                state:
+                  - value: "off"
+                    icon: mdi:checkbox-blank-circle-outline
+                    color: rgb(61,61,61)
+              - type: "custom:button-card"
+                name: 90
+                entity: input_boolean.timer_90min
+                icon: mdi:checkbox-blank-circle
+                color: rgb(25, 155, 20)
+                styles:
+                  card:
+                    - height: 40px
+                    - width: 40px
+                state:
+                  - value: "off"
+                    icon: mdi:checkbox-blank-circle-outline
+                    color: rgb(61,61,61)
+              - type: "custom:button-card"
+                color_type: blank-card
+          - type: entities
+            title: Switch
+            entities:
+              # Moved to fan package
+              #- switch.garageafs_low_speed
+              #- switch.garageafs_medium_speed
+              #- switch.garageafs_high_speed
+              #- switch.garage_fan
+              - switch.wled_sync_receive
+              - switch.wled_sync_send
+              - switch.wled_nightlight
+      - type: vertical-stack
+        cards:
+          - type: weather-forecast
+            #entity: weather.home
+            entity: weather.kmcc_hourly
+
+          - type: custom:simple-weather-card
+            entity: weather.kmcc_hourly
+            name: at home
+            backdrop:
+              day: "var(--primary-color)"
+              night: "#40445a"
+
+          - type: custom:weather-card
+            #entity: weather.ksac_daynight
+            entity: weather.kmcc_daynight
+            #name: Optional name
+            forecast: true
+            current: true
+            details: true
+            hourly_forecast: false
+            number_of_forecasts: 5
+
+          - type: vertical-stack
+            title: Trash & Recycle
+            cards:
+              - type: custom:garbage-collection-card
+                title: Hello World
+                entity: sensor.green
+                icon_size: 35px
+                icon_color: green
+                hide_before: 6
+              - type: custom:garbage-collection-card
+                entity: sensor.garbage
+                icon_size: 35px
+                icon_color: "#0561ba"
+                hide_before: 4
+              - type: custom:garbage-collection-card
+                entity: sensor.recycling
+                icon_size: 35px
+                icon_color: blue
+                hide_before: 6
+
+  - !include lovelace/01_3D_Printer.yaml
+  - !include lovelace/initial_test.yaml
+  - !include lovelace/04_testing.yaml
+  - !include lovelace/05_testing.yaml
+  - !include lovelace/06_testing.yaml

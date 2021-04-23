@@ -1,0 +1,17 @@
+afs_30:
+  alias: AFS OFF After 30min
+  sequence:
+  - entity_id: input_boolean.timer_30min
+    service: input_boolean.toggle
+  - entity_id: input_boolean.timer_60min
+    service: input_boolean.turn_off
+  - entity_id: input_boolean.timer_90min
+    service: input_boolean.turn_off
+  - condition: state
+    entity_id: input_boolean.timer_30min
+    state: 'on'
+  - delay: 00:01:00
+  - entity_id: script.garage_afs_off
+    service: homeassistant.turn_on
+  - entity_id: input_boolean.timer_30min
+    service: input_boolean.turn_off

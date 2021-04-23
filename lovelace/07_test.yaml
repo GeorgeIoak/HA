@@ -1,0 +1,109 @@
+id: testing07
+title: Testing07
+path: testing07
+panel: true
+cards:
+  - type: vertical-stack
+    cards:
+    - type: entities
+      title: Light
+      show_header_toggle: false
+      entities:
+        - light.front_room_light_switch
+        - light.kitchen_table_light
+        - light.garage_status_light
+        - light.wled
+    - type: "custom:hui-entities-card"
+      title: Garage AFS
+      show_header_toggle: false
+      entities:
+        - entity: switch.garage_fan
+        - entity: fan.garage_afs
+          type: custom:fan-control-entity-row
+          name: Garage Air Filter
+          customTheme: false
+        - type: "custom:button-entity-row"
+          buttons:
+            - entity: input_boolean.timer_30min
+              name: 30
+              service: input_select.select_option
+              service_data:
+                entity_id: input_select.fan_time_select
+                option: "30"
+              #custom:button-entity-row doesn't support hold_action
+              hold_action:
+                action: call-service
+                service: timer.cancel
+                service_data:
+                  entity_id: timer.garage_afs
+              style:
+              - flex-direction: column
+              icon_style:
+                - padding-right: 0 !important
+                - '--iron-icon-height': 2.5em
+                - '--iron-icon-width': 2.5em
+              state_styles:
+                "off":
+                  font-weight: normal
+                "on":
+                  color: green
+                  font-weight: bold
+            - entity: input_boolean.timer_60min
+              name: 60
+              service: input_select.select_option
+              service_data:
+                entity_id: input_select.fan_time_select
+                option: "60"
+              state_styles:
+                "off":
+                  font-weight: normal
+                "on":
+                  color: green
+                  font-weight: bold
+            - entity: input_boolean.timer_90min
+              name: 90
+              service: input_select.select_option
+              service_data:
+                entity_id: input_select.fan_time_select
+                option: "90"
+              state_styles:
+                "off":
+                  font-weight: normal
+                "on":
+                  color: green
+                  font-weight: bold
+            - entity: timer.garage_afs
+              name: "Time Left"
+              icon: none
+              show_state: true
+            
+          #   icon: mdi:checkbox-blank-circle
+
+          # - type: "custom:button-card"
+          #   name: 60
+          #   entity: input_boolean.timer_60min
+          #   icon: mdi:checkbox-blank-circle
+          #   color: rgb(25, 155, 20)
+          #   styles:
+          #     card:
+          #       - height: 40px
+          #       - width: 40px
+          #   state:
+          #     - value: "off"
+          #       icon: mdi:checkbox-blank-circle-outline
+          #       color: rgb(61,61,61)
+          # - type: "custom:button-card"
+          #   name: 90
+          #   entity: input_boolean.timer_90min
+          #   icon: mdi:checkbox-blank-circle
+          #   color: rgb(25, 155, 20)
+          #   styles:
+          #     card:
+          #       - height: 40px
+          #       - width: 40px
+          #   state:
+          #     - value: "off"
+          #       icon: mdi:checkbox-blank-circle-outline
+          #       color: rgb(61,61,61)
+          # - type: "custom:button-card"
+          #   color_type: blank-card

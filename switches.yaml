@@ -1,0 +1,50 @@
+#Moved to Platform
+
+# - platform: mqtt
+#   name: "GarageAFS Low Speed"
+#   state_topic: "stat/Garage_AFS/POWER1"
+#   command_topic: "cmnd/Garage_AFS/POWER1"
+#   availability_topic: "tele/Garage_AFS/LWT"
+#   qos: 1
+#   payload_on: "ON"
+#   payload_off: "OFF"
+#   payload_available: "Online"
+#   payload_not_available: "Offline"
+#   retain: true
+
+# - platform: mqtt
+#   name: "GarageAFS Medium Speed"
+#   state_topic: "stat/Garage_AFS/POWER2"
+#   command_topic: "cmnd/Garage_AFS/POWER2"
+#   availability_topic: "tele/Garage_AFS/LWT"
+#   qos: 1
+#   payload_on: "ON"
+#   payload_off: "OFF"
+#   payload_available: "Online"
+#   payload_not_available: "Offline"
+#   retain: true
+
+# - platform: mqtt
+#   name: "GarageAFS High Speed"
+#   state_topic: "stat/Garage_AFS/POWER3"
+#   command_topic: "cmnd/Garage_AFS/POWER3"
+#   availability_topic: "tele/Garage_AFS/LWT"
+#   qos: 1
+#   payload_on: "ON"
+#   payload_off: "OFF"
+#   payload_available: "Online"
+#   payload_not_available: "Offline"
+#   retain: true
+
+- platform: mqtt
+  name: "Garage Fan"
+  state_topic: "stat/Garage_AFS/POWER4"
+  command_topic: "cmnd/Garage_AFS/POWER4"
+  availability_topic: "tele/Garage_AFS/LWT"
+  qos: 1
+  payload_on: "ON"
+  payload_off: "OFF"
+  payload_available: "Online"
+  payload_not_available: "Offline"
+  retain: true
+  icon: mdi:fan

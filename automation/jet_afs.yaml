@@ -1,0 +1,97 @@
+#Control Garage Jet Air Filtration Unit
+#Moved to package
+
+# - alias: AFS Off
+#   trigger:
+#     platform: state
+#     entity_id:
+#       - input_select.afs_speed
+#     to: "NotON"
+#   action:
+#     - service: switch.turn_off
+#       entity_id:
+#         - switch.garageafs_low_speed
+#         - switch.garageafs_medium_speed
+#         - switch.garageafs_high_speed
+#         - switch.garage_fan
+#     - service: light.turn_off
+#       entity_id:
+#         - light.garage_status_light
+
+# - alias: AFS Low Speed
+#   trigger:
+#     platform: state
+#     entity_id:
+#       - input_select.afs_speed
+#     to: "LOW"
+#   action:
+#     - service: switch.turn_off
+#       entity_id:
+#         - switch.garageafs_low_speed
+#         - switch.garageafs_medium_speed
+#         - switch.garageafs_high_speed
+#     - delay: 0:00:03
+#     - service: switch.turn_on
+#       entity_id:
+#         - switch.garageafs_low_speed
+#     - service: light.turn_on
+#       entity_id:
+#         - light.garage_status_light
+#     - service: mqtt.publish
+#       data_template:
+#         topic: "cmnd/Garage_AFS/pixels"
+#         retain: "false"
+#         payload: 2
+
+# - alias: AFS Medium Speed
+#   trigger:
+#     platform: state
+#     entity_id:
+#       - input_select.afs_speed
+#     to: "MEDIUM"
+#   action:
+#     - service: switch.turn_off
+#       entity_id:
+#         - switch.garageafs_low_speed
+#         - switch.garageafs_medium_speed
+#         - switch.garageafs_high_speed
+#     - delay: 0:00:03
+#     - service: switch.turn_on
+#       entity_id:
+#         - switch.garageafs_medium_speed
+#         - switch.garage_fan
+#     - service: light.turn_on
+#       entity_id:
+#         - light.garage_status_light
+#     - service: mqtt.publish
+#       data_template:
+#         topic: "cmnd/Garage_AFS/pixels"
+#         retain: "false"
+#         payload: 4
+
+# - alias: AFS High Speed
+#   trigger:
+#     platform: state
+#     entity_id:
+#       - input_select.afs_speed
+#     to: "HIGH"
+#   action:
+#     - service: switch.turn_off
+#       entity_id:
+#         - switch.garageafs_low_speed
+#         - switch.garageafs_medium_speed
+#         - switch.garageafs_high_speed
+#     - delay: 0:00:03
+#     - service: switch.turn_on
+#       entity_id:
+#         - switch.garageafs_high_speed
+#         - switch.garage_fan
+#     - service: light.turn_on
+#       entity_id:
+#         - light.garage_status_light
+#     - service: mqtt.publish
+#       data_template:
+#         topic: "cmnd/Garage_AFS/pixels"
+#         retain: "false"
+#         payload: 8
+

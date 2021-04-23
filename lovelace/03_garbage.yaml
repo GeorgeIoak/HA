@@ -1,0 +1,20 @@
+title: Trash & Recycle
+icon: mdi:recycle
+cards:
+  - type: vertical-stack
+    cards:
+      - type: custom:garbage-collection-card
+        entity: sensor.green
+        icon_size: 35px
+        icon_color: green
+        hide_before: 6
+      - type: custom:garbage-collection-card
+        entity: sensor.garbage
+        icon_size: 35px
+        icon_color: '#0561ba'
+        hide_before: 4
+      - type: custom:garbage-collection-card
+        entity: sensor.recycling
+        icon_size: 35px
+        icon_color: blue
+        hide_before: 6

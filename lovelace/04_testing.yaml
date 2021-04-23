@@ -1,0 +1,67 @@
+id: testing
+title: Demo
+path: testing04
+panel: true
+cards:
+  - type: vertical-stack
+    cards:
+      - type: entities
+        title: Light
+        entities:
+          - light.front_room_light_switch
+          - light.kitchen_table_light
+          - light.garage_status_light
+          - light.wled
+      - type: entities
+        title: Garage Fan Stuff
+        show_header_toggle: true
+        entities:
+          - switch.garage_fan
+          - entity: fan.garage_afs
+            type: custom:fan-control-entity-row
+            name: Garage Air Filter
+        footer:
+          type: buttons
+          entities:
+            - entity: input_boolean.timer_30min
+              name: 30            
+              icon: mdi:checkbox-blank-circle
+              color: rgb(25, 155, 20)
+              tap_action:
+                action: call-service
+                service: script.garage_afs_off
+              state:
+                      - value: "off"
+                        icon: mdi:checkbox-blank-circle-outline
+                        color: rgb(61,61,61)
+            - entity: input_boolean.timer_60min
+              name: 60            
+              icon: mdi:checkbox-blank-circle
+              color: rgb(25, 155, 20)
+              tap_action:
+                action: call-service
+                service: script.garage_afs_off
+            - entity: input_boolean.timer_90min
+              name: 90            
+              icon: mdi:checkbox-blank-circle
+              color: rgb(25, 155, 20)
+              tap_action:
+                action: call-service
+                service: script.garage_afs_off
+            - entity: timer.garage_afs
+        
+      - type: entities
+        title: Switch
+        entities:
+          # Moved to fan package
+          #- switch.garageafs_low_speed
+          #- switch.garageafs_medium_speed
+          #- switch.garageafs_high_speed
+          #- switch.garage_fan
+          - switch.wled_sync_receive
+          - switch.wled_sync_send
+          - switch.wled_nightlight
+  - type: vertical-stack
+    cards:
+    - type: weather-forecast
+      entity: weather.home

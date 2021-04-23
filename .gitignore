@@ -1,0 +1,8 @@
+home-assistant*.*
+.cloud
+appdaemon
+secrets.yaml
+.storage
+custom_components
+community
+tts
