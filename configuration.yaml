@@ -3,13 +3,19 @@ default_config:
 mobile_app:
 discovery:
 
-mqtt:
-  broker: 192.168.10.201
-  discovery: true
-  discovery_prefix: homeassistant
+# Example configuration.yaml entry
+# logger:
+#   default: warning
+#   logs:
+#     homeassistant.components.mqtt: debug
 
-lovelace:
-  mode: yaml
+# mqtt:
+#   broker: 192.168.10.201
+#   discovery: true
+#   discovery_prefix: homeassistant
+
+# lovelace:
+#   mode: yaml
 
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
 # http:
