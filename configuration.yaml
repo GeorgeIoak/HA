@@ -45,6 +45,7 @@ automation old: !include_dir_merge_list automation
 script: !include scripts.yaml
 scene: !include scenes.yaml
 light: !include lights.yaml
+mqtt: !include mqtt.yaml
 sensor: !include sensors.yaml
 switch: !include switches.yaml
 input_select: !include input_select.yaml
@@ -52,8 +53,24 @@ input_boolean: !include_dir_merge_named input_boolean
 
 homeassistant:
   packages: !include_dir_named packages
+  unit_system: imperial
   allowlist_external_dirs:
     - /media
+
+# Weather Template
+weather:
+  - platform: template
+    name: "My Weather"
+    unique_id: 1d253178-64fe-4482-bc28-f1eae64079ba
+    condition_template: "{{ states('weather.climacell_daily') }}"
+    temperature_template: "{{ states('sensor.weather_station_t') | float }}"
+    humidity_template: "{{ states('sensor.weather_station_h') | float }}"
+    forecast_template: "{{ state_attr('weather.climacell_daily', 'forecast') }}"
+    pressure_template: "{{ (states('sensor.garage_pressure') | float) | round(1) }}"
+    wind_speed_template: "{{ states('sensor.weather_station_ws') | float }}"
+    wind_bearing_template: "{{ states('sensor.weather_station_wd') }}"
+    ozone_template: "{{ states('sensor.current_ozone_level') | float }}"
+    visibility_template: "{{ state_attr('weather.climacell_daily', 'visibility') }}"
 
 # enable stream for video doorbell
 stream:
@@ -101,3 +118,45 @@ influxdb:
   password: Yellow1997
   max_retries: 3
   default_measurement: state
+
+# Added for Hue Scene
+input_number:
+  hue_dynamic_scene_speed:
+    name: Hue scene speed
+    min: 0
+    max: 100
+    step: 10
+
+  hue_dynamic_scene_brightness:
+    name: Hue scene brightness
+    min: 0
+    max: 255
+    step: 10
+
+template:
+  binary_sensor:
+    - unique_id: selected_hue_group_active_scene
+      name: Selected Hue group active scene
+      state: >
+        {% set select = states('input_select.hue_group')|slugify %}
+        {% set group ='light.' + select %}
+        {{is_state_attr(group,'dynamics',true)}}
+
+    - unique_id: selected_hue_group_has_active_scenes_available
+      name: Selected Hue group has active scenes available
+      state: >
+        {% set hue_group = states('input_select.hue_group') %}
+        {{states.scene
+          |selectattr('attributes.group_name','eq',hue_group)
+          |selectattr('attributes.is_dynamic','eq',true)|list|length != 0}}
+
+    - unique_id: hue_groups_dynamic_scening
+      name: Hue groups dynamic scening
+      state: >
+        {{states.light|selectattr('attributes.dynamics','eq',true)|list|length != 0}}
+
+#        {% set select = states('input_select.hue_group') %}
+#        {% set group = states.light
+#          |selectattr('attributes.friendly_name','eq',select)
+#          |map(attribute='entity_id')|join %}
+#        {{is_state_attr(group,'dynamics',true)}}

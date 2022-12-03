@@ -1,0 +1,116 @@
+- id: '1635725928483'
+  name: Halloween
+  entities:
+    light.novoflood1:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - Wake up
+      - Cycle up
+      - Cycle down
+      - Random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
+      brightness: 255
+      hs_color:
+      - 285
+      - 100
+      rgb_color:
+      - 191
+      - 0
+      - 255
+      xy_color:
+      - 0.301
+      - 0.116
+      effect: None
+      friendly_name: NovoFlood1
+      supported_features: 36
+      state: 'on'
+    light.novoflood2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - Wake up
+      - Cycle up
+      - Cycle down
+      - Random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
+      brightness: 255
+      hs_color:
+      - 285
+      - 100
+      rgb_color:
+      - 191
+      - 0
+      - 255
+      xy_color:
+      - 0.301
+      - 0.116
+      effect: None
+      friendly_name: NovoFlood2
+      supported_features: 36
+      state: 'on'
+    light.novoflood3_2:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - Wake up
+      - Cycle up
+      - Cycle down
+      - Random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
+      brightness: 255
+      hs_color:
+      - 282
+      - 100
+      rgb_color:
+      - 178
+      - 0
+      - 255
+      xy_color:
+      - 0.283
+      - 0.108
+      effect: None
+      friendly_name: NovoFlood3
+      supported_features: 36
+      state: 'on'
+    light.novoflood4:
+      min_mireds: 153
+      max_mireds: 500
+      effect_list:
+      - None
+      - Wake up
+      - Cycle up
+      - Cycle down
+      - Random
+      supported_color_modes:
+      - color_temp
+      - hs
+      color_mode: hs
+      brightness: 255
+      hs_color:
+      - 285
+      - 100
+      rgb_color:
+      - 191
+      - 0
+      - 255
+      xy_color:
+      - 0.301
+      - 0.116
+      effect: None
+      friendly_name: NovoFlood4
+      supported_features: 36
+      state: 'on'
+  icon: mdi:skull
