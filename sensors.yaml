@@ -1,24 +1,24 @@
-- platform: mqtt
-  name: "Garage Temperature"
-  state_topic: "tele/Garage_AFS/SENSOR"
-  value_template: "{{ value_json['BME280'].Temperature }}"
-  unit_of_measurement: "F"
+# - platform: mqtt
+#   name: "Garage Temperature"
+#   state_topic: "tele/Garage_AFS/SENSOR"
+#   value_template: "{{ value_json['BME280'].Temperature }}"
+#   unit_of_measurement: "F"
 
-- platform: mqtt
-  name: "Garage Humidity"
-  state_topic: "tele/Garage_AFS/SENSOR"
-  value_template: "{{ value_json['BME280'].Humidity }}"
-  unit_of_measurement: "%"
+# - platform: mqtt
+#   name: "Garage Humidity"
+#   state_topic: "tele/Garage_AFS/SENSOR"
+#   value_template: "{{ value_json['BME280'].Humidity }}"
+#   unit_of_measurement: "%"
 
-- platform: mqtt
-  name: "Garage Pressure"
-  state_topic: "tele/Garage_AFS/SENSOR"
-  value_template: "{{ value_json['BME280'].Pressure * 0.02953337 | round(2) }}"
-  unit_of_measurement: "inHg"
+# - platform: mqtt
+#   name: "Garage Pressure"
+#   state_topic: "tele/Garage_AFS/SENSOR"
+#   value_template: "{{ value_json['BME280'].Pressure * 0.02953337 | round(2) }}"
+#   unit_of_measurement: "inHg"
 
-- platform: mqtt
-  name: "Doorbell Rang"
-  state_topic: "Doorbell"
+#- platform: mqtt
+#  name: "Doorbell Rang"
+#  state_topic: "Doorbell"
 # - platform: pi_hole
 #   host: localhost:4865
 #   #host: 192.168.10.49:4865
@@ -29,3 +29,11 @@
 #- platform: neurio_energy
 #  api_key: !secret neurio_client_id
 #  api_secret: !secret neurio_client_secret
+
+# - platform: mqtt
+#   name: "Weather Station Rain Total"
+#   state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/209"
+#   unit_of_measurement: "in"
+#   value_template: "{{ value_json.rain_mm | default }}"
+
+# - platform: moon

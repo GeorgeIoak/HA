@@ -15,3 +15,68 @@ afs_30:
     service: homeassistant.turn_on
   - entity_id: input_boolean.timer_30min
     service: input_boolean.turn_off
+
+# Hue Scene Selector Stuff
+
+activate_hue_dynamic_scene:
+  alias: Activate Hue dynamic scene
+  mode: restart
+  icon: mdi:power
+  sequence:
+    - condition: >
+        {{is_state('binary_sensor.selected_hue_group_active_scene','off')}}
+# first record current state of lights in the selected group
+    - service: scene.create
+      data:
+        scene_id: before_dynamic_scene
+        snapshot_entities:
+          - >
+            {% set select = states('input_select.hue_group')|slugify %}
+            {% set group ='light.' + select %}
+            {{group}}
+    - service: hue.activate_scene
+      data:
+        dynamic: true
+        speed: >
+          {{states('input_number.hue_dynamic_scene_speed')|int}}
+        brightness: >
+          {{states('input_number.hue_dynamic_scene_brightness')|int}}
+      target:
+        entity_id: >
+          {% set select = states('input_select.hue_dynamic_scene')|slugify %}
+          {{'scene.' + select}}
+
+#            {% set select = states('input_select.hue_dynamic_scene')%}
+#            {{states.scene
+#             |selectattr('attributes.friendly_name','eq',select)
+#             |map(attribute='entity_id')|join}}
+
+deactivate_hue_dynamic_scene:
+  alias: Deactivate Hue dynamic scene
+  mode: restart
+  icon: mdi:power-off
+  sequence:
+    - condition: >
+        {{is_state('binary_sensor.selected_hue_group_active_scene','on')}}
+    - service: hue.activate_scene
+      data:
+        dynamic: false
+      target:
+        entity_id: >
+          {% set select = states('input_select.hue_dynamic_scene')|slugify %}
+          {{'scene.' + select}}
+# reset the lights to the state before the dynamic scene activation
+    - service: scene.turn_on
+      target:
+        entity_id: scene.before_dynamic_scene
+#      - service: light.turn_on
+#        data:
+#          profile: relax
+#        target:
+#          entity_id: >
+#            {{'light.' + states('input_select.hue_group')|slugify}}
+
+#            {% set select = states('input_select.hue_dynamic_scene')%}
+#            {{states.scene
+#             |selectattr('attributes.friendly_name','eq',select)
+#             |map(attribute='entity_id')|join}}

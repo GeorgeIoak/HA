@@ -8,3 +8,31 @@
 #     - "HIGH"
 #   icon: mdi:fan
 #   initial: NotON
+
+front_light_color:
+  name: Change Colors of Lights
+  options:
+    - "Normal"
+    - "Red"
+    - "Orange"
+    - "Yellow"
+    - "Green"
+    - "Blue"
+    - "Indigo"
+    - "Violet"
+    - "Purple"
+  icon: mdi:lightbulb
+  initial: Normal
+
+# Hue Scene Picker
+# need at least 1 option for the config check, which will be overwritten during startup
+hue_group:
+  name: Select Hue group
+  options:
+    - Alarm
+#    initial: Alarm
+
+hue_dynamic_scene:
+  name: Hue Dynamic scene
+  options:
+    - 'Alarm - Tyrell'
