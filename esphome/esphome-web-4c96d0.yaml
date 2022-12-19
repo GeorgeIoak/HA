@@ -85,6 +85,7 @@ sensor:
     modbus_controller_id: solaredge
     name: "AC Phase B Current"
     id: solaredge_phase_b_current
+    internal: true
     register_type: holding
     address: 40073
     device_class: "current"
@@ -101,6 +102,7 @@ sensor:
     modbus_controller_id: solaredge
     name: "AC Phase C Current"
     id: solaredge_phase_c_current
+    internal: true
     register_type: holding
     address: 40074
     device_class: "current"
@@ -146,6 +148,7 @@ sensor:
     modbus_controller_id: solaredge
     name: "AC Phase BC Voltage"
     id: solaredge_bc_voltage
+    internal: true
     register_type: holding
     address: 40077
     device_class: "voltage"
@@ -162,6 +165,7 @@ sensor:
     modbus_controller_id: solaredge
     name: "AC Phase CA Voltage"
     id: solaredge_ca_voltage
+    internal: true
     register_type: holding
     address: 40078
     device_class: "voltage"
@@ -210,6 +214,7 @@ sensor:
     modbus_controller_id: solaredge
     name: "Phase C to Neutral Voltage"
     id: solaredge_cn_voltage
+    internal: true
     register_type: holding
     address: 40081
     device_class: "voltage"

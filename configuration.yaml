@@ -53,7 +53,7 @@ input_boolean: !include_dir_merge_named input_boolean
 
 homeassistant:
   packages: !include_dir_named packages
-  unit_system: imperial
+  #unit_system: imperial
   allowlist_external_dirs:
     - /media
 
@@ -63,12 +63,12 @@ weather:
     name: "My Weather"
     unique_id: 1d253178-64fe-4482-bc28-f1eae64079ba
     condition_template: "{{ states('weather.climacell_daily') }}"
-    temperature_template: "{{ states('sensor.weather_station_t') | float }}"
-    humidity_template: "{{ states('sensor.weather_station_h') | float }}"
+    temperature_template: "{{ states('sensor.cotech_367959_33_t') | float }}"
+    humidity_template: "{{ states('sensor.cotech_367959_33_h') | float }}"
     forecast_template: "{{ state_attr('weather.climacell_daily', 'forecast') }}"
     pressure_template: "{{ (states('sensor.garage_pressure') | float) | round(1) }}"
-    wind_speed_template: "{{ states('sensor.weather_station_ws') | float }}"
-    wind_bearing_template: "{{ states('sensor.weather_station_wd') }}"
+    wind_speed_template: "{{ states('sensor.cotech_367959_33_ws') | float }}"
+    wind_bearing_template: "{{ states('sensor.cotech_367959_33_wd') }}"
     ozone_template: "{{ states('sensor.current_ozone_level') | float }}"
     visibility_template: "{{ state_attr('weather.climacell_daily', 'visibility') }}"
 
