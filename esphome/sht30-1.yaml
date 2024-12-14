@@ -13,6 +13,7 @@ api:
     key: "kJFK01ZaP5GpiVJHZp75RaI2tRExSa35Iw+pVprU3fc="
 
 ota:
+  platform: esphome
   password: "e56e532e7d6c8618e98e2acdc83122b3"
 
 wifi:
@@ -55,7 +56,7 @@ sensor:
     address: 0x45
     update_interval: 60s
 
-# Example configuration entry
+
 light:
   - platform: rgb
     name: "GardenSpot Strip"
@@ -63,17 +64,54 @@ light:
     green: output_component2
     blue: output_component3
 
-# Example output entry
+    effects:
+      - pulse:
+      - pulse:
+          name: "Fast Pulse"
+          transition_length: 0.5s
+          update_interval: 0.5s
+      - pulse:
+          name: "Slow Pulse"
+          # transition_length: 1s      # defaults to 1s
+          update_interval: 2s
+
+# Create a light using the hbridge
+  - platform: hbridge
+    id: mainlight
+    name: "Fairy Lights"
+    pin_a: in1
+    pin_b: in2
+
+    effects:
+      - pulse:
+      - pulse:
+          name: "Fast Pulse"
+          transition_length: 0.5s
+          update_interval: 0.5s
+      - pulse:
+          name: "Slow Pulse"
+          # transition_length: 1s      # defaults to 1s
+          update_interval: 2s
+
+
 output:
   - platform: esp8266_pwm
     id: output_component1
-    pin: D5
+    pin: D6 #was D7
     max_power: 80%
   - platform: esp8266_pwm
     id: output_component2
-    pin: D6
+    pin: D5 #was D4
     max_power: 80%
   - platform: esp8266_pwm
     id: output_component3
-    pin: D7
+    pin: D0 #was D3
     max_power: 80%
+
+# Specify the two pins of the h-bridge as PWM pins
+  - platform: esp8266_pwm
+    id: in1
+    pin: D7 #was D6
+  - platform: esp8266_pwm
+    id: in2
+    pin: D8 #was D5

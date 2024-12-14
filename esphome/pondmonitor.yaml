@@ -1,0 +1,50 @@
+esphome:
+  name: pondmonitor
+  friendly_name: PondMonitor
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "bb4cpVpXvAfmTthGPRzUEjf58eeLZQA0snHMZUqs0yQ="
+  
+ota:
+  platform: esphome
+  password: "b0ca59b8e53e2623705f190454cb0bac"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Pondmonitor Fallback Hotspot"
+    password: "wSkMl4gfPacH"
+
+captive_portal:
+
+i2c:
+  sda: 17
+  scl: 16
+  scan: true
+  id: bus_a
+
+sensor:
+  - platform: hdc1080
+    temperature:
+      name: "Pond Shed Temp"
+    humidity:
+      name: "Pond Shed Humidity"
+    update_interval: 60s
+  - platform: sgp4x
+    voc:
+      name: "VOC Index"
+    nox:
+      name: "NOx Index"
