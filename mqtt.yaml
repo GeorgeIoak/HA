@@ -19,6 +19,90 @@ sensor:
     unit_of_measurement: "in"
     value_template: "{{ value_json.rain_mm | default }}"
 
+  - name: "FrontYard Battery"
+    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/battery_ok"
+    unit_of_measurement: "%"
+    value_template: "{{ float(value) * 99 + 1 }}"
+    state_class: measurement
+    device_class: battery
+    unique_id: Ambientweather-F007TH-FrontYard-B
+    device:
+      identifiers:
+        - Ambientweather-F007TH-FrontYard
+      model: Ambientweather-F007TH
+      manufacturer: rtl_433
+      name: Ambientweather-F007TH-FrontYard
+
+  - name: "FrontYard Humidity"
+    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/humidity"
+    unit_of_measurement: "%"
+    value_template: "{{ value | float }}"
+    state_class: measurement
+    device_class: humidity
+    unique_id: Ambientweather-F007TH-FrontYard-H
+    device:
+      identifiers:
+        - Ambientweather-F007TH-FrontYard
+      model: Ambientweather-F007TH
+      manufacturer: rtl_433
+      name: Ambientweather-F007TH-FrontYard
+
+  - name: "FrontYard Temperature"
+    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/temperature_C"
+    unit_of_measurement: "°C"
+    value_template: "{{ value | float | round(1) }}"
+    state_class: measurement
+    device_class: temperature
+    unique_id: Ambientweather-F007TH-FrontYard-T
+    device:
+      identifiers:
+        - Ambientweather-F007TH-FrontYard
+      model: Ambientweather-F007TH
+      manufacturer: rtl_433
+      name: Ambientweather-F007TH-FrontYard
+
+  - name: "BackYard Battery"
+    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/battery_ok"
+    unit_of_measurement: "%"
+    value_template: "{{ float(value) * 99 + 1 }}"
+    state_class: measurement
+    device_class: battery
+    unique_id: Ambientweather-F007TH-BackYard-B
+    device:
+      identifiers:
+        - Ambientweather-F007TH-BackYard
+      model: Ambientweather-F007TH
+      manufacturer: rtl_433
+      name: Ambientweather-F007TH-BackYard
+
+  - name: "BackYard Humidity"
+    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/humidity"
+    unit_of_measurement: "%"
+    value_template: "{{ value | float }}"
+    state_class: measurement
+    device_class: humidity
+    unique_id: Ambientweather-F007TH-BackYard-H
+    device:
+      identifiers:
+        - Ambientweather-F007TH-BackYard
+      model: Ambientweather-F007TH
+      manufacturer: rtl_433
+      name: Ambientweather-F007TH-BackYard
+
+  - name: "BackYard Temperature"
+    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/temperature_C"
+    unit_of_measurement: "°C"
+    value_template: "{{ value | float | round(1) }}"
+    state_class: measurement
+    device_class: temperature
+    unique_id: Ambientweather-F007TH-BackYard-T
+    device:
+      identifiers:
+        - Ambientweather-F007TH-BackYard
+      model: Ambientweather-F007TH
+      manufacturer: rtl_433
+      name: Ambientweather-F007TH-BackYard
+
 switch:
   - name: "Garage Fan"
     state_topic: "stat/Garage_AFS/POWER4"

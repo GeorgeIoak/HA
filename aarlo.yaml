@@ -1,0 +1,5 @@
+version: 1
+aarlo:
+  host: https://my.arlo.com
+  reconnect_every: 90
+  # backend: sse
