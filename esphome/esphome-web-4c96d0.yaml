@@ -15,6 +15,7 @@ logger:
 api:
 
 ota:
+  platform: esphome
 
 
 wifi:
@@ -29,7 +30,7 @@ wifi:
 captive_portal:
 
 uart:
-  id: uart2
+  id: uart_2
   tx_pin: 17
   rx_pin: 16
   baud_rate: 115200
@@ -38,7 +39,7 @@ uart:
 modbus:
   # flow_control_pin: 5
   id: modbus1
-  uart_id: uart2
+  uart_id: uart_2
 
 modbus_controller:
   - id: solaredge

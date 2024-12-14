@@ -37,3 +37,57 @@
 #   value_template: "{{ value_json.rain_mm | default }}"
 
 # - platform: moon
+
+# - platform: aarlo  # Commented 4/8/24 for v0.8
+#   monitored_conditions:
+#     - total_cameras
+#     - last_capture
+#     - recent_activity
+#     - captured_today
+#     - battery_level
+#     - signal_strength
+#     - temperature
+#     - humidity
+#     - air_quality
+
+# - platform: template
+#   sensors:
+#     ambientweather_sensor_channel_1:
+#       friendly_name: "Backyard Weather Sensor"
+#       value_template: >
+#         {% if states('sensor.ambientweather_sensor_channel_1') != 'unknown' %}
+#           {{ states('sensor.ambientweather_sensor_channel_1') }}
+#         {% endif %}
+#       attribute_templates:
+#         humidity: >
+#           {% if states.sensor.ambientweather_sensor_channel_1.attributes.humidity != None %}
+#             {{ states.sensor.ambientweather_sensor_channel_1.attributes.humidity }}
+#           {% endif %}
+#         temperature: >
+#           {% if states.sensor.ambientweather_sensor_channel_1.attributes.temperature_C != None %}
+#             {{ states.sensor.ambientweather_sensor_channel_1.attributes.temperature_C }}
+#           {% endif %}
+#         battery_ok: >
+#           {% if states.sensor.ambientweather_sensor_channel_1.attributes.battery_ok != None %}
+#             {{ states.sensor.ambientweather_sensor_channel_1.attributes.battery_ok }}
+#           {% endif %}
+
+#     ambientweather_sensor_channel_2:
+#       friendly_name: "Frontyard Weather Sensor"
+#       value_template: >
+#         {% if states('sensor.ambientweather_sensor_channel_2') != 'unknown' %}
+#           {{ states('sensor.ambientweather_sensor_channel_2') }}
+#         {% endif %}
+#       attribute_templates:
+#         humidity: >
+#           {% if states.sensor.ambientweather_sensor_channel_2.attributes.humidity != None %}
+#             {{ states.sensor.ambientweather_sensor_channel_2.attributes.humidity }}
+#           {% endif %}
+#         temperature: >
+#           {% if states.sensor.ambientweather_sensor_channel_2.attributes.temperature_C != None %}
+#             {{ states.sensor.ambientweather_sensor_channel_2.attributes.temperature_C }}
+#           {% endif %}
+#         battery_ok: >
+#           {% if states.sensor.ambientweather_sensor_channel_2.attributes.battery_ok != None %}
+#             {{ states.sensor.ambientweather_sensor_channel_2.attributes.battery_ok }}
+#           {% endif %}

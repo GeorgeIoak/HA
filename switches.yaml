@@ -48,3 +48,11 @@
 #   payload_not_available: "Offline"
 #   retain: true
 #   icon: mdi:fan
+
+# - platform: aarlo  # Commented out 4/8/24 for v0.8
+#   siren: True
+#   all_sirens: True
+#   snapshot: True
+#   doorbell_silence: True
+#   siren_volume: 1
+#   siren_duration: 10

@@ -1,7 +1,7 @@
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 mobile_app:
-discovery:
+# discovery: #Had to comment out because of update 8/6/23
 
 # Example configuration.yaml entry
 # logger:
@@ -38,6 +38,7 @@ tts:
 media_player:
   - platform: pioneer
     host: 192.168.10.20
+  # - platform: aarlo  # Commented 4/8/24 for v0.8
 
 group: !include groups.yaml
 automation: !include automations.yaml
@@ -63,21 +64,47 @@ weather:
     name: "My Weather"
     unique_id: 1d253178-64fe-4482-bc28-f1eae64079ba
     condition_template: "{{ states('weather.climacell_daily') }}"
-    temperature_template: "{{ states('sensor.cotech_367959_33_t') | float }}"
-    humidity_template: "{{ states('sensor.cotech_367959_33_h') | float }}"
-    forecast_template: "{{ state_attr('weather.climacell_daily', 'forecast') }}"
+    temperature_template: "{{ states('sensor.weather_station_temperature') | float }}"
+    humidity_template: "{{ states('sensor.weather_station_humidity') | float }}"
+    # forecast_template: "{{ state_attr('weather.climacell_daily', 'forecast') }}"
     pressure_template: "{{ (states('sensor.garage_pressure') | float) | round(1) }}"
-    wind_speed_template: "{{ states('sensor.cotech_367959_33_ws') | float }}"
-    wind_bearing_template: "{{ states('sensor.cotech_367959_33_wd') }}"
+    wind_speed_template: "{{ states('sensor.weather_station_wind_average') | float }}"
+    wind_bearing_template: "{{ states('sensor.weather_station_wind_direction') }}"
     ozone_template: "{{ states('sensor.current_ozone_level') | float }}"
     visibility_template: "{{ state_attr('weather.climacell_daily', 'visibility') }}"
 
 # enable stream for video doorbell
 stream:
 
+# aarlo:  # Commented out on 4/8/24 for v0.8
+#   host: https://my.arlo.com
+#   username: !secret arlo_username
+#   password: !secret arlo_password
+#   refresh_devices_every: 2
+#   stream_timeout: 120
+#   reconnect_every: 90
+
+#   tfa_source: imap
+#   tfa_type: email
+#   tfa_host: !secret tfa_host
+#   tfa_username: !secret tfa_username
+#   tfa_password: !secret tfa_password
+
+# camera:
+#   - platform: aarlo
+
+# binary_sensor:
+#   - platform: aarlo
+#     monitored_conditions:
+#       - motion
+#       - sound
+#       - ding
+#       - cry
+#       - connectivity
+
 # amcrest doorbell
 amcrest:
-  - host: 192.168.10.31
+  - host: 192.168.10.35
     name: "Driveway"
     username: !secret amcrest_doorbell_username
     password: !secret amcrest_doorbell_password
@@ -99,7 +126,7 @@ amcrest:
     sensors:
       - sdcard
 
-  - host: 192.168.10.32
+  - host: 192.168.10.33
     name: "Doorbell"
     username: !secret amcrest_doorbell_username
     password: !secret amcrest_doorbell_password
