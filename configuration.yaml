@@ -56,7 +56,12 @@ homeassistant:
   packages: !include_dir_named packages
   #unit_system: imperial
   allowlist_external_dirs:
-    - /media
+    - "/media"
+    - "/share"
+  media_dirs:
+    media: "/media"
+    media: /
+
 
 # Weather Template
 weather:
@@ -161,29 +166,45 @@ input_number:
     step: 10
 
 template:
-  binary_sensor:
+ - binary_sensor:
     - unique_id: selected_hue_group_active_scene
-      name: Selected Hue group active scene
+      name: "Selected Hue group active scene"
       state: >
-        {% set select = states('input_select.hue_group')|slugify %}
-        {% set group ='light.' + select %}
-        {{is_state_attr(group,'dynamics',true)}}
+        {{ % set select = states('input_select.hue_group')|slugify % }}
+        {{ % set group ='light.' + select % }}
+        {{ is_state_attr(group,'dynamics',true) }}
 
     - unique_id: selected_hue_group_has_active_scenes_available
-      name: Selected Hue group has active scenes available
+      name: "Selected Hue group has active scenes available"
       state: >
-        {% set hue_group = states('input_select.hue_group') %}
+        {{% set hue_group = states('input_select.hue_group') %}}
         {{states.scene
           |selectattr('attributes.group_name','eq',hue_group)
           |selectattr('attributes.is_dynamic','eq',true)|list|length != 0}}
 
     - unique_id: hue_groups_dynamic_scening
-      name: Hue groups dynamic scening
+      name: "Hue groups dynamic scening"
       state: >
         {{states.light|selectattr('attributes.dynamics','eq',true)|list|length != 0}}
 
-#        {% set select = states('input_select.hue_group') %}
-#        {% set group = states.light
-#          |selectattr('attributes.friendly_name','eq',select)
-#          |map(attribute='entity_id')|join %}
-#        {{is_state_attr(group,'dynamics',true)}}
+  #        {% set select = states('input_select.hue_group') %}
+  #        {% set group = states.light
+  #          |selectattr('attributes.friendly_name','eq',select)
+  #          |map(attribute='entity_id')|join %}
+  #        {{is_state_attr(group,'dynamics',true)}}
+
+ - sensor:
+    - name: "Days Until Garbage"
+      unique_id: days_until_garbage
+      state: >
+        {{ min(((state_attr('calendar.garbage', 'start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int,2) }}
+      attributes:
+        days: >
+          {{ ((state_attr('calendar.garbage', 'start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int }}
+    - name: "Days Until Recycling"
+      unique_id: days_until_recycling
+      state: >
+        {{ min(((state_attr('calendar.recycling', 'start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int,2) }}
+      attributes:
+        days: >
+          {{ ((state_attr('calendar.recycling', 'start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int }}
