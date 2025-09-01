@@ -1,0 +1,80 @@
+################################################################################
+# packages/camera.yaml
+#
+# What this contains
+# - stream: enables HA’s streaming support (move this here, delete from config.yaml)
+# - Amcrest: three cameras, with SD polling commented out by default (uncomment
+#            per camera ONLY if an SD card is installed & formatted)
+# - Safe wrappers: "(safe)" template sensors that never throw if the SD value
+#                  is missing/unknown. Use these on dashboards.
+################################################################################
+
+# Enable camera streaming (moved from configuration.yaml)
+stream:
+
+# -----------------------------
+# Amcrest cameras
+# Tip: Leave "sdcard" commented on any camera without a card to prevent
+#       the HTTP 400 → 'unknown' → numeric conversion errors in HA logs.
+#       You can still use the "(safe)" wrapper sensors below on dashboards.
+# -----------------------------
+amcrest:
+  - host: 192.168.10.35
+    name: "Driveway"
+    username: !secret amcrest_doorbell_username
+    password: !secret amcrest_doorbell_password
+    stream_source: rtsp
+    binary_sensors:
+      - motion_detected
+      - online
+    # sensors:
+    #   - sdcard       # ← UNCOMMENT ONLY if SD card installed in Driveway cam
+
+  - host: 192.168.10.34
+    name: "Stairs"
+    username: !secret amcrest_doorbell_username
+    password: !secret amcrest_doorbell_password
+    stream_source: rtsp
+    binary_sensors:
+      - motion_detected
+      - online
+    # sensors:
+    #   - sdcard       # ← UNCOMMENT ONLY if SD card installed in Stairs cam
+
+  # - host: 192.168.10.33
+  #   name: "Doorbell"
+  #   username: !secret amcrest_doorbell_username
+  #   password: !secret amcrest_doorbell_password
+  #   stream_source: rtsp
+  #   binary_sensors:
+  #     - motion_detected
+  #     - online
+  #   # sensors:
+  #   #   - sdcard       # ← keep off unless Doorbell has a card too
+
+# Doorbell: switch to ONVIF. Keep Amcrest disabled for .33
+
+# -----------------------------
+# Safe wrappers for SD % used
+# - These never publish a bad value. If the underlying entity doesn't exist
+#   or is unknown/unavailable, they simply go unavailable.
+# - Point dashboards/automations at these instead of the raw amcrest sensors.
+#   (Raw entities are usually sensor.<name>_sd_used -> check in Dev Tools > States)
+# -----------------------------
+template:
+  - sensor:
+      - name: "Driveway SD Used (safe)"
+        unique_id: driveway_sd_used_safe
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.driveway_sd_used') }}"
+        state: "{{ states('sensor.driveway_sd_used')|float(0) }}"
+
+      - name: "Stairs SD Used (safe)"
+        unique_id: stairs_sd_used_safe
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.stairs_sd_used') }}"
+        state: "{{ states('sensor.stairs_sd_used')|float(0) }}"

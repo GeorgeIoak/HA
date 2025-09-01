@@ -14,94 +14,140 @@ sensor:
     value_template: "{{ value_json['BME280'].Pressure * 0.02953337 | round(2) }}"
     unit_of_measurement: "inHg"
 
-  - name: "Weather Station Rain Total"
-    state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/209"
-    unit_of_measurement: "in"
-    value_template: "{{ value_json.rain_mm | default }}"
+  # Moved to packages/weather.yaml
+  # - name: "FrontYard Battery"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/battery_ok"
+  #   unit_of_measurement: "%"
+  #   value_template: "{{ float(value) * 99 + 1 }}"
+  #   state_class: measurement
+  #   device_class: battery
+  #   unique_id: Ambientweather-F007TH-FrontYard-B
+  #   device:
+  #     identifiers:
+  #       - Ambientweather-F007TH-FrontYard
+  #     model: Ambientweather-F007TH
+  #     manufacturer: rtl_433
+  #     name: Ambientweather-F007TH-FrontYard
 
-  - name: "FrontYard Battery"
-    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/battery_ok"
-    unit_of_measurement: "%"
-    value_template: "{{ float(value) * 99 + 1 }}"
-    state_class: measurement
-    device_class: battery
-    unique_id: Ambientweather-F007TH-FrontYard-B
-    device:
-      identifiers:
-        - Ambientweather-F007TH-FrontYard
-      model: Ambientweather-F007TH
-      manufacturer: rtl_433
-      name: Ambientweather-F007TH-FrontYard
+  # - name: "FrontYard Humidity"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/humidity"
+  #   unit_of_measurement: "%"
+  #   value_template: "{{ value | float }}"
+  #   state_class: measurement
+  #   device_class: humidity
+  #   unique_id: Ambientweather-F007TH-FrontYard-H
+  #   device:
+  #     identifiers:
+  #       - Ambientweather-F007TH-FrontYard
+  #     model: Ambientweather-F007TH
+  #     manufacturer: rtl_433
+  #     name: Ambientweather-F007TH-FrontYard
 
-  - name: "FrontYard Humidity"
-    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/humidity"
-    unit_of_measurement: "%"
-    value_template: "{{ value | float }}"
-    state_class: measurement
-    device_class: humidity
-    unique_id: Ambientweather-F007TH-FrontYard-H
-    device:
-      identifiers:
-        - Ambientweather-F007TH-FrontYard
-      model: Ambientweather-F007TH
-      manufacturer: rtl_433
-      name: Ambientweather-F007TH-FrontYard
+  # - name: "FrontYard Temperature"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/temperature_C"
+  #   unit_of_measurement: "°C"
+  #   value_template: "{{ value | float | round(1) }}"
+  #   state_class: measurement
+  #   device_class: temperature
+  #   unique_id: Ambientweather-F007TH-FrontYard-T
+  #   device:
+  #     identifiers:
+  #       - Ambientweather-F007TH-FrontYard
+  #     model: Ambientweather-F007TH
+  #     manufacturer: rtl_433
+  #     name: Ambientweather-F007TH-FrontYard
 
-  - name: "FrontYard Temperature"
-    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/temperature_C"
-    unit_of_measurement: "°C"
-    value_template: "{{ value | float | round(1) }}"
-    state_class: measurement
-    device_class: temperature
-    unique_id: Ambientweather-F007TH-FrontYard-T
-    device:
-      identifiers:
-        - Ambientweather-F007TH-FrontYard
-      model: Ambientweather-F007TH
-      manufacturer: rtl_433
-      name: Ambientweather-F007TH-FrontYard
+  # - name: "BackYard Battery"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/battery_ok"
+  #   unit_of_measurement: "%"
+  #   value_template: "{{ float(value) * 99 + 1 }}"
+  #   state_class: measurement
+  #   device_class: battery
+  #   unique_id: Ambientweather-F007TH-BackYard-B
+  #   device:
+  #     identifiers:
+  #       - Ambientweather-F007TH-BackYard
+  #     model: Ambientweather-F007TH
+  #     manufacturer: rtl_433
+  #     name: Ambientweather-F007TH-BackYard
 
-  - name: "BackYard Battery"
-    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/battery_ok"
-    unit_of_measurement: "%"
-    value_template: "{{ float(value) * 99 + 1 }}"
-    state_class: measurement
-    device_class: battery
-    unique_id: Ambientweather-F007TH-BackYard-B
-    device:
-      identifiers:
-        - Ambientweather-F007TH-BackYard
-      model: Ambientweather-F007TH
-      manufacturer: rtl_433
-      name: Ambientweather-F007TH-BackYard
+  # - name: "BackYard Humidity"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/humidity"
+  #   unit_of_measurement: "%"
+  #   value_template: "{{ value | float }}"
+  #   state_class: measurement
+  #   device_class: humidity
+  #   unique_id: Ambientweather-F007TH-BackYard-H
+  #   device:
+  #     identifiers:
+  #       - Ambientweather-F007TH-BackYard
+  #     model: Ambientweather-F007TH
+  #     manufacturer: rtl_433
+  #     name: Ambientweather-F007TH-BackYard
 
-  - name: "BackYard Humidity"
-    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/humidity"
-    unit_of_measurement: "%"
-    value_template: "{{ value | float }}"
-    state_class: measurement
-    device_class: humidity
-    unique_id: Ambientweather-F007TH-BackYard-H
-    device:
-      identifiers:
-        - Ambientweather-F007TH-BackYard
-      model: Ambientweather-F007TH
-      manufacturer: rtl_433
-      name: Ambientweather-F007TH-BackYard
+  # - name: "BackYard Temperature"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/temperature_C"
+  #   unit_of_measurement: "°C"
+  #   value_template: "{{ value | float | round(1) }}"
+  #   state_class: measurement
+  #   device_class: temperature
+  #   unique_id: Ambientweather-F007TH-BackYard-T
+  #   device:
+  #     identifiers:
+  #       - Ambientweather-F007TH-BackYard
+  #     model: Ambientweather-F007TH
+  #     manufacturer: rtl_433
+  #     name: Ambientweather-F007TH-BackYard
 
-  - name: "BackYard Temperature"
-    state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/temperature_C"
-    unit_of_measurement: "°C"
-    value_template: "{{ value | float | round(1) }}"
-    state_class: measurement
-    device_class: temperature
-    unique_id: Ambientweather-F007TH-BackYard-T
-    device:
-      identifiers:
-        - Ambientweather-F007TH-BackYard
-      model: Ambientweather-F007TH
-      manufacturer: rtl_433
-      name: Ambientweather-F007TH-BackYard
+  # - name: "WeatherStation Temperature"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/temperature_C"
+  #   unit_of_measurement: "°C"
+  #   device_class: temperature
+  #   value_template: "{{ value | float | round(1) }}"
+
+  # - name: "WeatherStation Humidity"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/humidity"
+  #   unit_of_measurement: "%"
+  #   device_class: humidity
+  #   value_template: "{{ value | float | round(0) }}"
+
+  # - name: "WeatherStation Rainfall"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/rain_mm"
+  #   unit_of_measurement: "mm"
+  #   device_class: precipitation
+  #   value_template: "{{ value | float | round(1) }}"
+
+  # - name: "WeatherStation Wind Direction"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_dir_deg"
+  #   unit_of_measurement: "°"
+  #   value_template: "{{ value | float | round(0) }}"
+
+  # - name: "WeatherStation Wind Avg"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_avg_m_s"
+  #   unit_of_measurement: "m/s"
+  #   device_class: wind_speed
+  #   value_template: "{{ value | float | round(1) }}"
+
+  # - name: "WeatherStation Wind Max"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_max_m_s"
+  #   unit_of_measurement: "m/s"
+  #   device_class: wind_speed
+  #   value_template: "{{ value | float | round(1) }}"
+
+  # - name: "WeatherStation Light"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/light_lux"
+  #   unit_of_measurement: "lx"
+  #   device_class: illuminance
+  #   value_template: "{{ value | float | round(0) }}"
+
+  # - name: "WeatherStation UV Index"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/uv"
+  #   unit_of_measurement: ""
+  #   value_template: "{{ value | float | round(1) }}"
+
+  # - name: "WeatherStation Battery OK"
+  #   state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/battery_ok"
+  #   value_template: "{{ 'OK' if value | int == 1 else 'Low' }}"
 
 switch:
   - name: "Garage Fan"
@@ -130,44 +176,44 @@ light:
     payload_off: "off"
     unique_id: 68f0af04-4d6a-481c-8c1f-21e04b9e1607
 
-  - name: "Front Room Light Switch"
-    state_topic: "stat/front-room_light_switch/POWER"
-    command_topic: "cmnd/front-room_light_switch/POWER"
-    availability_topic: "tele/front-room_light_switch/LWT"
-    brightness_state_topic: "stat/front-room_light_switch/RESULT"
-    brightness_command_topic: "cmnd/front-room_light_switch/Dimmer"
-    brightness_scale: 100
-    brightness_value_template: "{{ value_json.Dimmer }}"
-    qos: 1
-    payload_on: "ON"
-    payload_off: "OFF"
-    payload_available: "Online"
-    payload_not_available: "Offline"
-    retain: false
+  # - name: "Front Room Light Switch" # Let Tasmota auto add it now
+  #   state_topic: "stat/front-room_light_switch/POWER"
+  #   command_topic: "cmnd/front-room_light_switch/POWER"
+  #   availability_topic: "tele/front-room_light_switch/LWT"
+  #   brightness_state_topic: "stat/front-room_light_switch/RESULT"
+  #   brightness_command_topic: "cmnd/front-room_light_switch/Dimmer"
+  #   brightness_scale: 100
+  #   brightness_value_template: "{{ value_json.Dimmer }}"
+  #   qos: 1
+  #   payload_on: "ON"
+  #   payload_off: "OFF"
+  #   payload_available: "Online"
+  #   payload_not_available: "Offline"
+  #   retain: false
 
-  - name: "2nd Set of Overhead Garage Lights"
-    state_topic: "stat/2ndGarageLights/RESULT"
-    #value_template: "{{ value_json.POWER }}"
-    command_topic: "cmnd/2ndGarageLights/POWER"
-    availability_topic: "tele/2ndGarageLights/LWT"
-    qos: 1
-    payload_on: "ON"
-    payload_off: "OFF"
-    payload_available: "Online"
-    payload_not_available: "Offline"
-    retain: false
+  # - name: "2nd Set of Overhead Garage Lights" # Let Tasmota auto add it now
+  #   state_topic: "stat/2ndGarageLights/RESULT"
+  #   #value_template: "{{ value_json.POWER }}"
+  #   command_topic: "cmnd/2ndGarageLights/POWER"
+  #   availability_topic: "tele/2ndGarageLights/LWT"
+  #   qos: 1
+  #   payload_on: "ON"
+  #   payload_off: "OFF"
+  #   payload_available: "Online"
+  #   payload_not_available: "Offline"
+  #   retain: false
 
-  - name: "Front Landscape Lighting"
-    state_topic: "stat/FrontLandscapeLights/RESULT"
-    #value_template: "{{ value_json.POWER }}"
-    command_topic: "cmnd/FrontLandscapeLights/POWER"
-    availability_topic: "tele/FrontLandscapeLights/LWT"
-    qos: 1
-    payload_on: "ON"
-    payload_off: "OFF"
-    payload_available: "Online"
-    payload_not_available: "Offline"
-    retain: false
+  # - name: "Front Landscape Lighting" # Let Tasmota auto add it now
+  #   state_topic: "stat/FrontLandscapeLights/RESULT"
+  #   #value_template: "{{ value_json.POWER }}"
+  #   command_topic: "cmnd/FrontLandscapeLights/POWER"
+  #   availability_topic: "tele/FrontLandscapeLights/LWT"
+  #   qos: 1
+  #   payload_on: "ON"
+  #   payload_off: "OFF"
+  #   payload_available: "Online"
+  #   payload_not_available: "Offline"
+  #   retain: false
 
   - name: Garage Status Light
     effect_list:

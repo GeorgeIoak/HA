@@ -1,3 +1,30 @@
+- platform: template
+  sensors:
+    garage_pressure_rounded:
+      friendly_name: "Garage Pressure Rounded"
+      availability_template: "{{ states('sensor.garage_pressure') | is_number }}"
+      value_template: "{{ (states('sensor.garage_pressure') | float) | round(1) }}"
+      # If your HA version allows templating here, this will mirror the source unit.
+      # If check-config complains about templated units, either remove this line
+      # or set a fixed unit (e.g., 'inHg' or 'hPa').
+      unit_of_measurement: "{{ state_attr('sensor.garage_pressure', 'unit_of_measurement') }}"
+      icon_template: mdi:gauge
+
+- platform: template
+  sensors:
+    garage_door_status_verbose:
+      friendly_name: "Garage Door Status"
+      value_template: >
+        {% set state = states.cover.garage_door.state %}
+        {% set time = (states.cover.garage_door.last_changed | as_local).strftime('%H:%M') %}
+        {% if state == 'open' %}
+          🚪 Opened at {{ time }}
+        {% elif state == 'closed' %}
+          🔒 Closed at {{ time }}
+        {% else %}
+          ❓ Unknown state
+        {% endif %}
+
 # - platform: mqtt
 #   name: "Garage Temperature"
 #   state_topic: "tele/Garage_AFS/SENSOR"

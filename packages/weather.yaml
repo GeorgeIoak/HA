@@ -1,220 +1,257 @@
-# Download the BOM icons from https://github.com/DavidFW1960/bom_forecast/blob/master/bom_icons.zip
-# and save them under <config-dir>/www/icons/bom_icons/ (Note this is for the example in the ftp component. This is different to the animated card.)
-# For the animated card follow the instructions and put the icons in <config-dir>/www/icons/weather_icons. This is a DIFFERENT icon file to the above.
-# Show BOM Satellite and Radar
+################################################################################
+# /config/packages/weather.yaml
+#
+# Weather package:
+# - MQTT sensors (rtl_433: Ambientweather F007TH + Cotech 367959 WeatherStation)
+# - Rain: cumulative(mm) ➜ delta(mm) ➜ delta(in) ➜ 24h/today/season (INCHES)
+# - Template weather ("My Weather"): Tomorrow.io → NWS → Home (first available)
+# - Wind conversions to mph (view sensors)
+################################################################################
 
+###############################################################################
+# MQTT sensors (rtl_433)
+###############################################################################
+mqtt:
+  sensor:
+    # --- Ambientweather F007TH: Front Yard ---
+    - name: "FrontYard Battery"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/battery_ok"
+      unit_of_measurement: "%"
+      value_template: "{{ value | float(0) * 99 + 1 }}"
+      state_class: measurement
+      device_class: battery
+      unique_id: Ambientweather-F007TH-FrontYard-B
+      device:
+        identifiers: [Ambientweather-F007TH-FrontYard]
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-FrontYard
+
+    - name: "FrontYard Humidity"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/humidity"
+      unit_of_measurement: "%"
+      value_template: "{{ value | float(0) }}"
+      state_class: measurement
+      device_class: humidity
+      unique_id: Ambientweather-F007TH-FrontYard-H
+      device:
+        identifiers: [Ambientweather-F007TH-FrontYard]
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-FrontYard
+
+    - name: "FrontYard Temperature"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/temperature_C"
+      unit_of_measurement: "°C"
+      value_template: "{{ value | float(0) | round(1) }}"
+      state_class: measurement
+      device_class: temperature
+      unique_id: Ambientweather-F007TH-FrontYard-T
+      device:
+        identifiers: [Ambientweather-F007TH-FrontYard]
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-FrontYard
+
+    # --- Ambientweather F007TH: Back Yard ---
+    - name: "BackYard Battery"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/battery_ok"
+      unit_of_measurement: "%"
+      value_template: "{{ value | float(0) * 99 + 1 }}"
+      state_class: measurement
+      device_class: battery
+      unique_id: Ambientweather-F007TH-BackYard-B
+      device:
+        identifiers: [Ambientweather-F007TH-BackYard]
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-BackYard
+
+    - name: "BackYard Humidity"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/humidity"
+      unit_of_measurement: "%"
+      value_template: "{{ value | float(0) }}"
+      state_class: measurement
+      device_class: humidity
+      unique_id: Ambientweather-F007TH-BackYard-H
+      device:
+        identifiers: [Ambientweather-F007TH-BackYard]
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-BackYard
+
+    - name: "BackYard Temperature"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/temperature_C"
+      unit_of_measurement: "°C"
+      value_template: "{{ value | float(0) | round(1) }}"
+      state_class: measurement
+      device_class: temperature
+      unique_id: Ambientweather-F007TH-BackYard-T
+      device:
+        identifiers: [Ambientweather-F007TH-BackYard]
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-BackYard
+
+    # --- Cotech 367959 Weather Station ---
+    - name: "WeatherStation Temperature"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/temperature_C"
+      unit_of_measurement: "°C"
+      device_class: temperature
+      value_template: "{{ value | float(0) | round(1) }}"
+
+    - name: "WeatherStation Humidity"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/humidity"
+      unit_of_measurement: "%"
+      device_class: humidity
+      value_template: "{{ value | float(0) | round(0) }}"
+
+    - name: "WeatherStation Rainfall"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/rain_mm"
+      unit_of_measurement: "mm"
+      device_class: precipitation
+      value_template: "{{ value | float(0) | round(1) }}"
+
+    - name: "WeatherStation Wind Direction"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_dir_deg"
+      unit_of_measurement: "°"
+      value_template: "{{ value | float(0) | round(0) }}"
+
+    - name: "WeatherStation Wind Avg"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_avg_m_s"
+      unit_of_measurement: "m/s"
+      device_class: wind_speed
+      value_template: "{{ value | float(0) | round(1) }}"
+
+    - name: "WeatherStation Wind Max"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_max_m_s"
+      unit_of_measurement: "m/s"
+      device_class: wind_speed
+      value_template: "{{ value | float(0) | round(1) }}"
+
+    - name: "WeatherStation Light"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/light_lux"
+      unit_of_measurement: "lx"
+      device_class: illuminance
+      value_template: "{{ value | float(0) | round(0) }}"
+
+    - name: "WeatherStation UV Index"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/uv"
+      value_template: "{{ value | float(0) | round(1) }}"
+
+###############################################################################
+# Helper sensors & conversions
+###############################################################################
+template:
+  - sensor:
+      # Rain delta (mm) from cumulative mm, clamp negatives on counter reset
+      - name: "Rain Delta (mm)"
+        unique_id: rain_delta_mm
+        unit_of_measurement: "mm"
+        device_class: precipitation
+        state_class: measurement
+        state: >-
+          {% set p = states('sensor.weatherstation_rainfall') | float(0) %}
+          {% set last = this.attributes.get('last_total', p) | float(0) %}
+          {% set raw = p - last %}
+          {{ raw if raw >= 0 else 0 }}
+        attributes:
+          last_total: "{{ states('sensor.weatherstation_rainfall') | float(0) }}"
+
+      # Expose rain delta in inches for all downstream sensors/cards
+      - name: "Rain Delta"
+        unique_id: rain_delta_in
+        unit_of_measurement: "in"
+        device_class: precipitation
+        state_class: measurement
+        state: "{{ (states('sensor.rain_delta_mm') | float(0)) / 25.4 }}"
+
+      # Wind Avg (mph), convert only if the source reports m/s
+      - name: "Wind Avg (mph)"
+        unique_id: wind_avg_mph_view
+        unit_of_measurement: "mph"
+        device_class: wind_speed
+        state_class: measurement
+        state: >-
+          {% set v = states('sensor.weatherstation_wind_avg') | float(0) %}
+          {% set unit = state_attr('sensor.weatherstation_wind_avg','unit_of_measurement') | lower %}
+          {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
+
+      # Wind Max (mph), convert only if the source reports m/s
+      - name: "Wind Max (mph)"
+        unique_id: wind_max_mph_view
+        unit_of_measurement: "mph"
+        device_class: wind_speed
+        state_class: measurement
+        state: >-
+          {% set v = states('sensor.weatherstation_wind_max') | float(0) %}
+          {% set unit = state_attr('sensor.weatherstation_wind_max','unit_of_measurement') | lower %}
+          {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
+
+###############################################################################
+# Rolling 24-hour rain total (inches)
+###############################################################################
 sensor:
-  - platform: template
-    sensors:
-      bom_current_text:
-        value_template: >
-          {% set val = states('sensor.kariong_short_text_0').split('.')[0] %} 
-          {{ val | title }}
-
-      uv_cat_formatted:
-        value_template: "{{ states('sensor.kariong_uv_category_0') | replace('veryhigh', 'Very High') | title }}"
-
-      bom_uv_alert:
-        value_template: >
-          UV Today: Sun Protection 
-          {{ as_timestamp(states('sensor.kariong_uv_start_time_0'),default='n/a') | timestamp_custom(' %I:%M%p',default='n/a') | lower | replace(" 0", "") }} to {{ as_timestamp(states('sensor.kariong_uv_end_time_0'),default='n/a') | timestamp_custom(' %I:%M%p',default='n/a') | lower | replace(" 0", "") }}, UV Index predicted to reach {{ states('sensor.kariong_uv_max_index_0') }} [{{ states('sensor.uv_cat_formatted') }}]
-
-      bom_fire_danger:
-        value_template: "Fire Danger Today: {{ states('sensor.kariong_fire_danger_0') }}"
-
-      # Beaufort
-      # https://en.wikipedia.org/wiki/Beaufort_scale
-      beaufort:
-        value_template: >
-          {%- if states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 118 -%}
-          12
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 103 -%}
-          11
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 89 -%}
-          10
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 75 -%}
-          9
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 62 -%}
-          8
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 50 -%}
-          7
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 39 -%}
-          6
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 29 -%}
-          5
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 20 -%}
-          4
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 12 -%}
-          3
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 6 -%}
-          2
-          {%- elif states('sensor.gosford_wind_speed_kilometre') | float(default='n/a')  >= 2 -%}
-          1
-          {%- else -%}
-          0
-          {%- endif -%}
-
-      # Heatindex
-      # https://en.wikipedia.org/wiki/Heat_index
-      heatindex:
-        unit_of_measurement: °C
-        device_class: temperature
-        value_template: >
-          {%- if states('sensor.gosford_temp') | float(default='n/a') > 27 and states('sensor.gosford_humidity') | float(default='n/a') > 40 -%}
-          {% set T = states('sensor.gosford_temp') | float(default='n/a') %}
-          {% set R = states('sensor.gosford_humidity') | float(default='n/a') %}
-          {% set c1 = -8.78469475556 %}
-          {% set c2 = 1.61139411 %}
-          {% set c3 = 2.33854883889 %}
-          {% set c4 = -0.14611605 %}
-          {% set c5 = -0.012308094 %}
-          {% set c6 = -0.0164248277778 %}
-          {% set c7 = 0.002211732 %}
-          {% set c8 = 0.00072546 %}
-          {% set c9 = -0.000003582 %}
-          {% set HI = c1 + (c2 * T ) + (c3 * R) + ( c4 * T * R ) + ( c5 * T**2 ) + ( c6 * R**2 ) + ( c7 * T**2 * R ) + ( c8 * T * R**2 ) + ( c9 * T**2 * R**2 ) %} 
-          {{ HI | round }}
-          {%- else -%}
-          n/a
-          {%- endif -%}
-      heatindexrating:
-        value_template: >
-          {%- if states('sensor.heatindex') == 'n/a' -%}
-          Out of range
-          {%- elif states('sensor.heatindex') | float(default='n/a')  >= 54 -%}
-          Extreme danger: heat stroke imminent
-          {%- elif states('sensor.heatindex') | float(default='n/a')  >= 41 -%}
-          Danger: cramps, exhaustion heat stroke probable
-          {%- elif states('sensor.heatindex') | float(default='n/a')  >= 32 -%}
-          Extreme caution: cramps and exhaustion possible
-          {%- elif states('sensor.heatindex') | float(default='n/a')  >= 26 -%}
-          Caution: fatigue possible
-          {%- else -%}
-          Normal
-          {%- endif -%}
-
-      bom_forecast_0:
-        friendly_name: "Today"
-        value_template: >
-          {% if states('sensor.kariong_temp_min_0') == 'unknown' %} {% set min = states('sensor.bom_today_min') %} {% else %} {% set min = states('sensor.kariong_temp_min_0') %} {% endif %}
-          {% if states('sensor.kariong_temp_max_0') == 'unknown' %} {% set max = states('sensor.bom_today_max') %} {% else %} {% set max = states('sensor.kariong_temp_max_0') %} {% endif %}
-          {{ max|round(0,default='none')}}°/{{ min|round(0,default='none')}}°/{{states('sensor.kariong_rain_chance_0')|round(0,default='none')}}%
-        entity_picture_template: >-
-          {%- if states('sun.sun') == 'below_horizon' and (states('sensor.kariong_icon_descriptor_0') == 'fog' or states('sensor.kariong_icon_descriptor_0') == 'haze' or states('sensor.kariong_icon_descriptor_0') == 'hazy' or states('sensor.kariong_icon_descriptor_0') == 'light-showers' or states('sensor.kariong_icon_descriptor_0') == 'partly-cloudy' or states('sensor.kariong_icon_descriptor_0') == 'showers' or states('sensor.kariong_icon_descriptor_0') == 'shower' or states('sensor.kariong_icon_descriptor_0') == 'light_showers' or states('sensor.kariong_icon_descriptor_0') == 'light_shower' or states('sensor.kariong_icon_descriptor_0') == 'partly_cloudy' or states('sensor.kariong_icon_descriptor_0') == 'mostly_sunny') -%}
-          {{ '/local/icons/bom_icons/' ~ states('sensor.kariong_icon_descriptor_0') ~ '-night.png' }}
-          {%- else -%}
-          {{ '/local/icons/bom_icons/' ~ states('sensor.kariong_icon_descriptor_0') ~ '.png' }}
-          {%- endif -%}
-
-      bom_forecast_1:
-        friendly_name_template: >
-          {%- set date = as_timestamp(now(),default='n/a') + (1 * 86400 ) -%}
-          {{ date | timestamp_custom('Tomorrow (%-d/%-m)',default='n/a') }}
-        value_template: >
-          {{states('sensor.kariong_temp_max_1')|round(0)}}°/{{states('sensor.kariong_temp_min_1')|round(0)}}°/{{states('sensor.kariong_rain_chance_1')|round(0)}}%
-        entity_picture_template: >-
-          {{ '/local/icons/bom_icons/' ~ states('sensor.kariong_icon_descriptor_1') ~ '.png' }}
-
-      bom_forecast_2:
-        friendly_name_template: >
-          {%- set date = as_timestamp(now(),default='n/a') + (2 * 86400 ) -%}
-          {{ date | timestamp_custom('%A (%-d/%-m)',default='n/a') }}
-        value_template: >
-          {{states('sensor.kariong_temp_max_2')|round(0)}}°/{{states('sensor.kariong_temp_min_2')|round(0)}}°/{{states('sensor.kariong_rain_chance_2')|round(0)}}%
-        entity_picture_template: >-
-          {{ '/local/icons/bom_icons/' ~ states('sensor.kariong_icon_descriptor_2') ~ '.png' }}
-
-      bom_forecast_3:
-        friendly_name_template: >
-          {%- set date = as_timestamp(now(),default='n/a') + (3 * 86400 ) -%}
-          {{ date | timestamp_custom('%A (%-d/%-m)',default='n/a') }}
-        value_template: >
-          {{states('sensor.kariong_temp_max_3')|round(0)}}°/{{states('sensor.kariong_temp_min_3')|round(0)}}°/{{states('sensor.kariong_rain_chance_3')|round(0)}}%
-        entity_picture_template: >-
-          {{ '/local/icons/bom_icons/' ~ states('sensor.kariong_icon_descriptor_3') ~ '.png' }}
-
-      bom_forecast_4:
-        friendly_name_template: >
-          {%- set date = as_timestamp(now(),default='n/a') + (4 * 86400 ) -%}
-          {{ date | timestamp_custom('%A (%-d/%-m)',default='n/a') }}
-        value_template: >
-          {{states('sensor.kariong_temp_max_4')|round(0)}}°/{{states('sensor.kariong_temp_min_4')|round(0)}}°/{{states('sensor.kariong_rain_chance_4')|round(0)}}%
-        entity_picture_template: >-
-          {{ '/local/icons/bom_icons/' ~ states('sensor.kariong_icon_descriptor_4') ~ '.png' }}
-
-      bom_forecast_5:
-        friendly_name_template: >
-          {%- set date = as_timestamp(now(),default='n/a') + (5 * 86400 ) -%}
-          {{ date | timestamp_custom('%A (%-d/%-m)',default='n/a') }}
-        value_template: >
-          {{states('sensor.kariong_temp_max_5')|round(0)}}°/{{states('sensor.kariong_temp_min_5')|round(0)}}°/{{states('sensor.kariong_rain_chance_5')|round(0)}}%
-        entity_picture_template: >-
-          {{ '/local/icons/bom_icons/' ~ states('sensor.kariong_icon_descriptor_5') ~ '.png' }}
-
-      bom_forecast_6:
-        friendly_name_template: >
-          {%- set date = as_timestamp(now(),default='n/a') + (6 * 86400 ) -%}
-          {{ date | timestamp_custom('%A (%-d/%-m)',default='n/a') }}
-        value_template: >
-          {{states('sensor.kariong_temp_max_6')|round(0,default='unknown')}}°/{{states('sensor.kariong_temp_min_6')|round(0,default='unknown')}}°/{{states('sensor.kariong_rain_chance_6')|round(0,default='unknown')}}%
-        entity_picture_template: >-
-          {{ '/local/icons/bom_icons/' ~ states('sensor.kariong_icon_descriptor_6') ~ '.png' }}
-
-      # ONLY USE ONE bom_today_max below:
-      bom_today_max:
-        value_template: >
-          {{ state_attr('sensor.today_temp_bom', 'max_value') }}
-
-      #      bom_today_max:
-      #        value_template: >
-      #          {%- if states('sensor.kariong_temp_max_0') == 'n/a' -%}
-      #            {{ state_attr('sensor.today_temp_bom', 'max_value') }}
-      #          {% else %}
-      #            {{ states('sensor.kariong_temp_max_0') }}
-      #          {% endif %}
-
-      # ONLY USE ONE bom_today_min below:
-      bom_today_min:
-        value_template: >
-          {{ state_attr('sensor.today_temp_bom', 'min_value') }}
-
-  #      bom_today_min:
-  #        value_template: >
-  #          {%- if states('sensor.kariong_temp_min_0') == 'n/a' -%}
-  #            {{ state_attr('sensor.today_temp_bom', 'min_value') }}
-  #          {% else %}
-  #            {{ states('sensor.kariong_temp_min_0') }}
-  #          {% endif %}
-
-  # # IMPORTANT NOTE IF YOU USE average, you must comment out the below statistics sensor. Both cannot exist
-  # # https://github.com/Limych/ha-average
-  # - platform: average
-  #   name: today_temp_bom
-  #   entities:
-  #     - sensor.gosford_temp
-  #   start: "{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}"
-  #   end: "{{ now() }}"
-
-  # IMPORTANT NOTE IF YOU USE statistics, you must comment out the above average sensor. Both cannot exist
   - platform: statistics
-    name: today_temp_bom
-    sampling_size: 150
-    entity_id: sensor.gosford_temp
-    state_characteristic: mean
+    name: "Rain Last 24h"
+    unique_id: rain_last_24h_in
+    entity_id: sensor.rain_delta
+    state_characteristic: sum
     max_age:
       hours: 24
+    sampling_size: 2000
 
-automation:
-  - alias: "Update BOM Icons"
-    trigger:
-      - event: start
-        platform: homeassistant
-      - entity_id: sun.sun
-        platform: state
-        to: "above_horizon"
-      - entity_id: sun.sun
-        platform: state
-        to: "below_horizon"
-    action:
-      - service: homeassistant.update_entity
-        entity_id: sensor.bom_forecast_0, sensor.bom_forecast_1, sensor.bom_forecast_2, sensor.bom_forecast_3, sensor.bom_forecast_4, sensor.bom_forecast_5 #, sensor.bom_forecast_6
+###############################################################################
+# Utility meters (inches) — daily & seasonal (reset Jul 1)
+###############################################################################
+utility_meter:
+  rain_today:
+    source: sensor.rain_delta
+    unique_id: rain_today_in
+    name: "Rain Today"
+    cycle: daily
+    delta_values: true
+
+  rain_season:
+    source: sensor.rain_delta
+    unique_id: rain_season_in
+    name: "Rain Season"
+    delta_values: true
+    cron: "0 0 1 7 *"  # reset Jul 1 at 00:00 local
+
+###############################################################################
+# Weather template entity ("My Weather")
+#   Picks the first provider that isn't unknown/unavailable/empty
+###############################################################################
+weather:
+  - platform: template
+    name: "My Weather"
+    unique_id: 1d253178-64fe-4482-bc28-f1eae64079ba
+
+    condition_template: >-
+      {% set order = ['weather.tomorrow_io_daily','weather.nws','weather.home'] %}
+      {% set chosen = namespace(id=None) %}
+      {% for e in order %}
+        {% if states(e) not in ['unknown','unavailable',''] %}
+          {% set chosen.id = e %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+      {{ states(chosen.id) if chosen.id else 'unknown' }}
+
+    temperature_template: "{{ states('sensor.weatherstation_temperature') | float(0) }}"
+    humidity_template: "{{ states('sensor.weatherstation_humidity') | float(0) }}"
+    pressure_template: "{{ (states('sensor.garage_pressure') | float(0)) | round(1) }}"
+    wind_speed_template: "{{ states('sensor.weatherstation_wind_avg') | float(0) }}"
+    wind_bearing_template: "{{ states('sensor.weatherstation_wind_direction') }}"
+    ozone_template: "{{ states('sensor.current_ozone_level') | float(0) }}"
+    visibility_template: >-
+      {% set order = ['weather.tomorrow_io_daily','weather.nws','weather.home'] %}
+      {% set chosen = namespace(id=None) %}
+      {% for e in order %}
+        {% if states(e) not in ['unknown','unavailable',''] %}
+          {% set chosen.id = e %}
+          {% break %}
+        {% endif %}
+      {% endfor %}
+      {{ state_attr(chosen.id, 'visibility') if chosen.id else None }}
