@@ -4,3 +4,5 @@ aarlo:
   reconnect_every: 90
   # backend: sse
   user_agent: linux
+  save_session: False
+  verbose_debug: True

@@ -6,3 +6,4 @@ secrets.yaml
 custom_components
 community
 tts
+.aarlo/aarlo.pickle

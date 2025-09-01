@@ -1,0 +1,272 @@
+###
+# /config/packages/weather.yaml
+#
+# One-stop weather package:
+# - MQTT sensors (rtl_433: Ambientweather F007TH + Cotech 367959 WeatherStation)
+# - Rain helpers: Rain Delta, Rain Last 24h, Rain Today, Rain Season (Jul 1 reset)
+# - Unit conversions: Rain Today (in), Rain Season (in), Wind Avg/Max (mph)
+# - Weather template entity ("My Weather")
+#
+# After installing:
+# 1) Remove/comment duplicates from mqtt.yaml and configuration.yaml.
+# 2) Developer Tools → YAML → Reload MQTT / Template / Utility Meter, or Restart HA.
+###
+
+###############################################################################
+# MQTT sensors (moved here from mqtt.yaml)
+###############################################################################
+mqtt:
+  sensor:
+    - name: "FrontYard Battery"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/battery_ok"
+      unit_of_measurement: "%"
+      value_template: "{{ float(value) * 99 + 1 }}"
+      state_class: measurement
+      device_class: battery
+      unique_id: Ambientweather-F007TH-FrontYard-B
+      device:
+        identifiers:
+          - Ambientweather-F007TH-FrontYard
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-FrontYard
+
+    - name: "FrontYard Humidity"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/humidity"
+      unit_of_measurement: "%"
+      value_template: "{{ value | float }}"
+      state_class: measurement
+      device_class: humidity
+      unique_id: Ambientweather-F007TH-FrontYard-H
+      device:
+        identifiers:
+          - Ambientweather-F007TH-FrontYard
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-FrontYard
+
+    - name: "FrontYard Temperature"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/FrontYard/temperature_C"
+      unit_of_measurement: "°C"
+      value_template: "{{ value | float | round(1) }}"
+      state_class: measurement
+      device_class: temperature
+      unique_id: Ambientweather-F007TH-FrontYard-T
+      device:
+        identifiers:
+          - Ambientweather-F007TH-FrontYard
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-FrontYard
+
+    - name: "BackYard Battery"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/battery_ok"
+      unit_of_measurement: "%"
+      value_template: "{{ float(value) * 99 + 1 }}"
+      state_class: measurement
+      device_class: battery
+      unique_id: Ambientweather-F007TH-BackYard-B
+      device:
+        identifiers:
+          - Ambientweather-F007TH-BackYard
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-BackYard
+
+    - name: "BackYard Humidity"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/humidity"
+      unit_of_measurement: "%"
+      value_template: "{{ value | float }}"
+      state_class: measurement
+      device_class: humidity
+      unique_id: Ambientweather-F007TH-BackYard-H
+      device:
+        identifiers:
+          - Ambientweather-F007TH-BackYard
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-BackYard
+
+    - name: "BackYard Temperature"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Ambientweather-F007TH/BackYard/temperature_C"
+      unit_of_measurement: "°C"
+      value_template: "{{ value | float | round(1) }}"
+      state_class: measurement
+      device_class: temperature
+      unique_id: Ambientweather-F007TH-BackYard-T
+      device:
+        identifiers:
+          - Ambientweather-F007TH-BackYard
+        model: Ambientweather-F007TH
+        manufacturer: rtl_433
+        name: Ambientweather-F007TH-BackYard
+
+    - name: "WeatherStation Temperature"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/temperature_C"
+      unit_of_measurement: "°C"
+      device_class: temperature
+      value_template: "{{ value | float | round(1) }}"
+
+    - name: "WeatherStation Humidity"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/humidity"
+      unit_of_measurement: "%"
+      device_class: humidity
+      value_template: "{{ value | float | round(0) }}"
+
+    - name: "WeatherStation Rainfall"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/rain_mm"
+      unit_of_measurement: "mm"
+      device_class: precipitation
+      value_template: "{{ value | float | round(1) }}"
+
+    - name: "WeatherStation Wind Direction"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_dir_deg"
+      unit_of_measurement: "°"
+      value_template: "{{ value | float | round(0) }}"
+
+    - name: "WeatherStation Wind Avg"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_avg_m_s"
+      unit_of_measurement: "m/s"
+      device_class: wind_speed
+      value_template: "{{ value | float | round(1) }}"
+
+    - name: "WeatherStation Wind Max"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_max_m_s"
+      unit_of_measurement: "m/s"
+      device_class: wind_speed
+      value_template: "{{ value | float | round(1) }}"
+
+    - name: "WeatherStation Light"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/light_lux"
+      unit_of_measurement: "lx"
+      device_class: illuminance
+      value_template: "{{ value | float | round(0) }}"
+
+    - name: "WeatherStation UV Index"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/uv"
+      unit_of_measurement: ""
+      value_template: "{{ value | float | round(1) }}"
+
+    - name: "WeatherStation Battery OK"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/battery_ok"
+      value_template: "{{ 'OK' if value | int == 1 else 'Low' }}"
+
+###############################################################################
+# Helper sensors & conversions
+###############################################################################
+template:
+  # Convert cumulative rainfall into per-update delta (clamp negatives)
+  - trigger:
+      - platform: state
+        entity_id: sensor.weatherstation_rainfall
+    sensor:
+      - name: "Rain Delta"
+        unique_id: rain_delta_from_cumulative
+        unit_of_measurement: "{{ state_attr('sensor.weatherstation_rainfall', 'unit_of_measurement') or 'mm' }}"
+        device_class: precipitation
+        state_class: measurement
+        state: >-
+          {% set old = (trigger.from_state.state | float(0)) if trigger.from_state else 0.0 %}
+          {% set new = (trigger.to_state.state   | float(0)) if trigger.to_state   else 0.0 %}
+          {{ max(0.0, new - old) }}
+
+  # Unit conversions / views
+  - sensor:
+      - name: "Rain Season (in)"
+        unique_id: rain_season_inches_view
+        unit_of_measurement: "in"
+        device_class: precipitation
+        state_class: total
+        state: >-
+          {% set v = states('sensor.rain_season') | float(0) %}
+          {% set unit = state_attr('sensor.rain_season','unit_of_measurement') | lower %}
+          {% if unit in ['mm','millimeter','millimetre'] %}
+            {{ (v / 25.4) | round(2) }}
+          {% else %}
+            {{ v | round(2) }}
+          {% endif %}
+
+      - name: "Rain Today (in)"
+        unique_id: rain_today_inches_view
+        unit_of_measurement: "in"
+        device_class: precipitation
+        state_class: total
+        state: >-
+          {% set v = states('sensor.rain_today') | float(0) %}
+          {% set unit = state_attr('sensor.rain_today','unit_of_measurement') | lower %}
+          {% if unit in ['mm','millimeter','millimetre'] %}
+            {{ (v / 25.4) | round(2) }}
+          {% else %}
+            {{ v | round(2) }}
+          {% endif %}
+
+      - name: "Wind Avg (mph)"
+        unique_id: wind_avg_mph_view
+        unit_of_measurement: "mph"
+        device_class: wind_speed
+        state_class: measurement
+        state: >-
+          {% set v = states('sensor.weatherstation_wind_avg') | float(0) %}
+          {% set unit = state_attr('sensor.weatherstation_wind_avg','unit_of_measurement') | lower %}
+          {% if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second'] %}
+            {{ (v * 2.23694) | round(1) }}
+          {% else %}
+            {{ v | round(1) }}
+          {% endif %}
+
+      - name: "Wind Max (mph)"
+        unique_id: wind_max_mph_view
+        unit_of_measurement: "mph"
+        device_class: wind_speed
+        state_class: measurement
+        state: >-
+          {% set v = states('sensor.weatherstation_wind_max') | float(0) %}
+          {% set unit = state_attr('sensor.weatherstation_wind_max','unit_of_measurement') | lower %}
+          {% if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second'] %}
+            {{ (v * 2.23694) | round(1) }}
+          {% else %}
+            {{ v | round(1) }}
+          {% endif %}
+
+###############################################################################
+# Rolling 24-hour rain total
+###############################################################################
+sensor:
+  - platform: statistics
+    name: "Rain Last 24h"
+    unique_id: rain_last_24h_sum
+    entity_id: sensor.rain_delta
+    state_characteristic: sum
+    max_age:
+      hours: 24
+
+###############################################################################
+# Utility meters: season (Jul 1 reset) and daily
+###############################################################################
+utility_meter:
+  rain_season:
+    source: sensor.weatherstation_rainfall
+    cron: "0 0 1 7 *" # 00:00 on July 1 every year
+    periodically_resetting: true
+
+  rain_today:
+    source: sensor.weatherstation_rainfall
+    cycle: daily
+    periodically_resetting: true
+
+###############################################################################
+# Weather template entity
+###############################################################################
+weather:
+  - platform: template
+    name: "My Weather"
+    unique_id: 1d253178-64fe-4482-bc28-f1eae64079ba
+    condition_template: "{{ states('weather.climacell_daily') }}"
+    temperature_template: "{{ states('sensor.weatherstation_temperature') | float }}"
+    humidity_template: "{{ states('sensor.weatherstation_humidity') | float }}"
+    # forecast_template: "{{ state_attr('weather.climacell_daily', 'forecast') }}"
+    pressure_template: "{{ (states('sensor.garage_pressure') | float) | round(1) }}"
+    wind_speed_template: "{{ states('sensor.weatherstation_wind_avg') | float }}"
+    wind_bearing_template: "{{ states('sensor.weatherstation_wind_direction') }}"
+    ozone_template: "{{ states('sensor.current_ozone_level') | float }}"
+    visibility_template: "{{ state_attr('weather.climacell_daily', 'visibility') }}"

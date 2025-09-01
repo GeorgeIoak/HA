@@ -1,0 +1,43 @@
+###
+# Rain package
+# - Rolling 24h total from a cumulative counter that may reset
+# - Season-to-date total that resets every July 1
+###
+
+# 1) Convert cumulative rainfall into per-update "delta" (mm since last update),
+#    clamping negatives to 0 so device resets don't subtract from totals.
+template:
+  - trigger:
+      - platform: state
+        entity_id: sensor.weatherstation_rainfall
+    sensor:
+      - name: "Rain Delta"
+        unique_id: rain_delta_mm
+        unit_of_measurement: "mm"
+        device_class: precipitation
+        state_class: measurement
+        # Use trigger vars: from_state / to_state (strings) -> floats
+        state: >-
+          {% set old = (trigger.from_state.state | float(0)) %}
+          {% set new = (trigger.to_state.state   | float(0)) %}
+          {{ max(0.0, new - old) }}
+
+# 2) Rolling 24-hour sum of the per-update deltas
+sensor:
+  - platform: statistics
+    name: "Rain Last 24h"
+    entity_id: sensor.rain_delta
+    state_characteristic: sum
+    max_age:
+      hours: 24
+    # Optional but helpful:
+    # The statistics sensor sets state to the 'sum' due to state_characteristic: sum
+    # Units/device_class come from the source automatically, but we can enforce via customize if desired.
+
+# 3) Season-to-date total (resets 00:00 on July 1 every year),
+#    fed directly from the cumulative counter, with protection against occasional resets.
+utility_meter:
+  rain_season:
+    source: sensor.weatherstation_rainfall
+    cron: "0 0 1 7 *" # 00:00 on July 1
+    periodically_resetting: true

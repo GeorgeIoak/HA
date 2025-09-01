@@ -62,7 +62,7 @@ camera = Doorbell #(it will show up in the MQTT topic)
 #config.read('/config/'+camera+'.conf')
 user = admin
 pswd = Yellow1997
-host = "192.168.10.32" # camera address
+host = "192.168.10.33" # camera address
 port = 80 #(or whatever port you need it)
 ad110 = True #if AD110 or possibly the Dahua doorbell
 basetopic = ""#whatever first trunk topic you want to use (homeassistant) with NO "/"
