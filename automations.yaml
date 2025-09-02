@@ -121,7 +121,6 @@
       - binary_sensor.protection_window
       - sensor.current_uv_index
     data: {}
-
 - alias: Auto populate Hue group input select
   id: Auto populate Hue group input select
   mode: restart
@@ -197,7 +196,7 @@
         parts[-1] }}'
       payload: '{{ trigger.payload }}'
       qos: 0
-      retain: false
+      retain: true
     action: mqtt.publish
   mode: parallel
   max: 8
