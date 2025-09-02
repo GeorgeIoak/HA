@@ -1,9 +1,15 @@
-home-assistant*.*
-.cloud
-appdaemon
+# Core HA runtime artifacts
+*.db
+*.log
+*.pickle*
+*.bak
 secrets.yaml
-.storage
-custom_components
-community
-tts
+.secrets/
+.storage/
+.cloud/
+tts/
+community/
+custom_components/
+appdaemon/
+home-assistant*.*
 .aarlo/
