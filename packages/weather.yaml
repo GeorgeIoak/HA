@@ -98,73 +98,125 @@ mqtt:
       state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/temperature_C"
       unit_of_measurement: "°C"
       device_class: temperature
+      state_class: measurement
       value_template: "{{ value | float(0) | round(1) }}"
+      unique_id: Cotech-367959-WeatherStation-T
+      device:
+        identifiers: [Cotech-367959-WeatherStation]
+        model: Cotech-367959
+        manufacturer: rtl_433
+        name: Cotech-367959-WeatherStation
 
     - name: "WeatherStation Humidity"
       state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/humidity"
       unit_of_measurement: "%"
       device_class: humidity
+      state_class: measurement
       value_template: "{{ value | float(0) | round(0) }}"
+      unique_id: Cotech-367959-WeatherStation-H
+      device:
+        identifiers: [Cotech-367959-WeatherStation]
+        model: Cotech-367959
+        manufacturer: rtl_433
+        name: Cotech-367959-WeatherStation
 
     - name: "WeatherStation Rainfall"
       state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/rain_mm"
       unit_of_measurement: "mm"
       device_class: precipitation
+      state_class: measurement
       value_template: "{{ value | float(0) | round(1) }}"
+      unique_id: Cotech-367959-WeatherStation-R
+      device:
+        identifiers: [Cotech-367959-WeatherStation]
+        model: Cotech-367959
+        manufacturer: rtl_433
+        name: Cotech-367959-WeatherStation
 
     - name: "WeatherStation Wind Direction"
       state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_dir_deg"
       unit_of_measurement: "°"
+      state_class: measurement
       value_template: "{{ value | float(0) | round(0) }}"
+      unique_id: Cotech-367959-WeatherStation-WD
+      device:
+        identifiers: [Cotech-367959-WeatherStation]
+        model: Cotech-367959
+        manufacturer: rtl_433
+        name: Cotech-367959-WeatherStation
 
     - name: "WeatherStation Wind Avg"
       state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_avg_m_s"
       unit_of_measurement: "m/s"
       device_class: wind_speed
+      state_class: measurement
       value_template: "{{ value | float(0) | round(1) }}"
+      unique_id: Cotech-367959-WeatherStation-WA
+      device:
+        identifiers: [Cotech-367959-WeatherStation]
+        model: Cotech-367959
+        manufacturer: rtl_433
+        name: Cotech-367959-WeatherStation
 
     - name: "WeatherStation Wind Max"
       state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_max_m_s"
       unit_of_measurement: "m/s"
       device_class: wind_speed
+      state_class: measurement
       value_template: "{{ value | float(0) | round(1) }}"
+      unique_id: Cotech-367959-WeatherStation-WM
+      device:
+        identifiers: [Cotech-367959-WeatherStation]
+        model: Cotech-367959
+        manufacturer: rtl_433
+        name: Cotech-367959-WeatherStation
 
     - name: "WeatherStation Light"
       state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/light_lux"
       unit_of_measurement: "lx"
       device_class: illuminance
+      state_class: measurement
       value_template: "{{ value | float(0) | round(0) }}"
+      unique_id: Cotech-367959-WeatherStation-L
+      device:
+        identifiers: [Cotech-367959-WeatherStation]
+        model: Cotech-367959
+        manufacturer: rtl_433
+        name: Cotech-367959-WeatherStation
 
     - name: "WeatherStation UV Index"
       state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/uv"
+      state_class: measurement
       value_template: "{{ value | float(0) | round(1) }}"
+      unique_id: Cotech-367959-WeatherStation-U
+      device:
+        identifiers: [Cotech-367959-WeatherStation]
+        model: Cotech-367959
+        manufacturer: rtl_433
+        name: Cotech-367959-WeatherStation
 
 ###############################################################################
 # Helper sensors & conversions
 ###############################################################################
 template:
   - sensor:
-      # Rain delta (mm) from cumulative mm, clamp negatives on counter reset
-      - name: "Rain Delta (mm)"
-        unique_id: rain_delta_mm
-        unit_of_measurement: "mm"
-        device_class: precipitation
-        state_class: measurement
-        state: >-
-          {% set p = states('sensor.weatherstation_rainfall') | float(0) %}
-          {% set last = this.attributes.get('last_total', p) | float(0) %}
-          {% set raw = p - last %}
-          {{ raw if raw >= 0 else 0 }}
-        attributes:
-          last_total: "{{ states('sensor.weatherstation_rainfall') | float(0) }}"
-
-      # Expose rain delta in inches for all downstream sensors/cards
-      - name: "Rain Delta"
-        unique_id: rain_delta_in
+      - name: "Rain Delta (in)"
+        unique_id: rain_delta_in_guarded
         unit_of_measurement: "in"
         device_class: precipitation
         state_class: measurement
-        state: "{{ (states('sensor.rain_delta_mm') | float(0)) / 25.4 }}"
+        availability: "{{ states('sensor.weatherstation_rainfall') | is_number }}"
+        state: >-
+          {% set cum_mm = states('sensor.weatherstation_rainfall') | float(0) %}
+          {% set last_mm = this.attributes.get('last_total_mm', cum_mm) | float(0) %}
+          {% set raw_mm = cum_mm - last_mm %}
+          {% set inc_mm = 0 if raw_mm < 0 else raw_mm %}
+          {# drop obviously bad spikes (> ~2 in = 50.8 mm) #}
+          {% set inc_mm = 0 if inc_mm > 50.8 else inc_mm %}
+          {{ (inc_mm / 25.4) | round(2) }}
+        attributes:
+          last_total_mm: "{{ states('sensor.weatherstation_rainfall') | float(0) }}"
+
 
       # Wind Avg (mph), convert only if the source reports m/s
       - name: "Wind Avg (mph)"
@@ -193,9 +245,9 @@ template:
 ###############################################################################
 sensor:
   - platform: statistics
-    name: "Rain Last 24h"
-    unique_id: rain_last_24h_in
-    entity_id: sensor.rain_delta
+    name: "Rain 24h"
+    unique_id: rain_24h_in
+    entity_id: sensor.rain_delta_in
     state_characteristic: sum
     max_age:
       hours: 24
@@ -206,14 +258,14 @@ sensor:
 ###############################################################################
 utility_meter:
   rain_today:
-    source: sensor.rain_delta
+    source: sensor.rain_delta_in
     unique_id: rain_today_in
     name: "Rain Today"
     cycle: daily
     delta_values: true
 
   rain_season:
-    source: sensor.rain_delta
+    source: sensor.rain_delta_in
     unique_id: rain_season_in
     name: "Rain Season"
     delta_values: true

@@ -3,12 +3,19 @@
     garage_pressure_rounded:
       friendly_name: "Garage Pressure Rounded"
       availability_template: "{{ states('sensor.garage_pressure') | is_number }}"
-      value_template: "{{ (states('sensor.garage_pressure') | float) | round(1) }}"
-      # If your HA version allows templating here, this will mirror the source unit.
-      # If check-config complains about templated units, either remove this line
-      # or set a fixed unit (e.g., 'inHg' or 'hPa').
-      unit_of_measurement: "{{ state_attr('sensor.garage_pressure', 'unit_of_measurement') }}"
+      value_template: >-
+        {% set v = states('sensor.garage_pressure') | float(0) %}
+        {% set u = (state_attr('sensor.garage_pressure','unit_of_measurement') or '') | lower %}
+        {% if u in ['hpa','mbar'] %}
+          {{ (v * 0.02953) | round(1) }}   {# hPa → inHg #}
+        {% elif u == 'pa' %}
+          {{ (v * 0.0002953) | round(1) }} {# Pa → inHg #}
+        {% else %}
+          {{ v | round(1) }}               {# assume already in inHg #}
+        {% endif %}
+      unit_of_measurement: "inHg"
       icon_template: mdi:gauge
+
 
 - platform: template
   sensors:
