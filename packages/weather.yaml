@@ -205,8 +205,8 @@ template:
         unit_of_measurement: "in"
         device_class: precipitation
         state_class: measurement
-        availability: "{{ states('sensor.weatherstation_rainfall') | is_number }}"
         state: >-
+          {# Use 0.0 when the source is unknown/unavailable so this sensor stays available #}
           {% set cum_mm = states('sensor.weatherstation_rainfall') | float(0) %}
           {% set last_mm = this.attributes.get('last_total_mm', cum_mm) | float(0) %}
           {% set raw_mm = cum_mm - last_mm %}
@@ -216,7 +216,6 @@ template:
           {{ (inc_mm / 25.4) | round(2) }}
         attributes:
           last_total_mm: "{{ states('sensor.weatherstation_rainfall') | float(0) }}"
-
 
       # Wind Avg (mph), convert only if the source reports m/s
       - name: "Wind Avg (mph)"

@@ -3,11 +3,12 @@ default_config:
 mobile_app:
 # discovery: #Had to comment out because of update 8/6/23
 
-# Example configuration.yaml entry
-# logger:
-#   default: warning
-#   logs:
-#     homeassistant.components.mqtt: debug
+logger:
+  default: warning
+  logs:
+    # Silence ONVIF time-drift warnings, keep real errors
+    homeassistant.components.onvif: error
+    homeassistant.components.amcrest: error
 
 # mqtt:
 #   broker: 192.168.10.201
@@ -42,7 +43,7 @@ media_player:
 
 group: !include groups.yaml
 automation: !include automations.yaml
-automation old: !include_dir_merge_list automation
+# automation old: !include_dir_merge_list automation
 script: !include scripts.yaml
 scene: !include scenes.yaml
 light: !include lights.yaml
