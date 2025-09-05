@@ -16,10 +16,9 @@ tts/
 .aarlo/
 
 # 🧪 Volatile system files (not useful for tracking config changes)
-.storage/
-# ⬅️ Optional: If you want to track dashboards, whitelist specific files below
-
-# 🧠 Preserve dashboard logic
+# Ignore most of .storage, but allow dashboard-related files
+!.storage/
+.storage/*
 !.storage/lovelace
 !.storage/lovelace_dashboards
 !.storage/lovelace_resources
@@ -37,4 +36,3 @@ __pycache__/
 *.swp
 *.tmp
 *.DS_Store
-

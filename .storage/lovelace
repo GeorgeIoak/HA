@@ -1,0 +1,870 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace",
+  "data": {
+    "config": {
+      "title": "My Home",
+      "views": [
+        {
+          "icon": "mdi:home-assistant",
+          "title": "Home",
+          "badges": [
+            {
+              "entity": "person.george_ioakimedes"
+            },
+            {
+              "type": "entity",
+              "show_name": false,
+              "show_state": true,
+              "show_icon": true,
+              "entity": "sensor.garage_temperature",
+              "color": "",
+              "name": "Garage Temp",
+              "icon": "mdi:temperature-fahrenheit"
+            },
+            {
+              "type": "entity",
+              "show_name": false,
+              "show_state": true,
+              "show_icon": true,
+              "entity": "sensor.garage_humidity",
+              "color": "",
+              "icon": "mdi:water-percent"
+            },
+            {
+              "type": "entity",
+              "show_name": false,
+              "show_state": true,
+              "show_icon": true,
+              "entity": "sensor.garage_pressure_rounded"
+            },
+            {
+              "entity": "sun.sun"
+            },
+            {
+              "type": "entity",
+              "show_name": false,
+              "show_state": true,
+              "show_icon": true,
+              "entity": "sensor.weatherstation_uv_index",
+              "icon": "mdi:sun-wireless"
+            }
+          ],
+          "cards": [
+            {
+              "type": "custom:button-card",
+              "entity": "cover.garage_door",
+              "show_name": true,
+              "show_label": true,
+              "show_state": false,
+              "name": "🚗 Garage Door",
+              "icon": "[[[\n  return entity.state === 'open' ? 'mdi:garage-open' : 'mdi:garage';\n]]]\n",
+              "label": "[[[\n  const time = new Date(entity.last_changed).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });\n  return entity.state === 'open'\n    ? `Click to Close (Opened at ${time})`\n    : `Click to Open (Closed at ${time})`;\n]]]\n",
+              "tap_action": {
+                "action": "call-service",
+                "service": "[[[\n  return entity.state === 'open' ? 'cover.close_cover' : 'cover.open_cover';\n]]]\n",
+                "service_data": {
+                  "entity_id": "cover.garage_door"
+                }
+              },
+              "styles": {
+                "grid": [
+                  {
+                    "grid-template-areas": "\"n\" \"i\" \"l\""
+                  },
+                  {
+                    "grid-template-rows": "auto 1fr auto"
+                  },
+                  {
+                    "justify-items": "center"
+                  }
+                ],
+                "name": [
+                  {
+                    "grid-area": "n"
+                  },
+                  {
+                    "font-size": "20px"
+                  },
+                  {
+                    "font-weight": "bold"
+                  },
+                  {
+                    "padding-bottom": "4px"
+                  }
+                ],
+                "icon": [
+                  {
+                    "grid-area": "i"
+                  },
+                  {
+                    "width": "64px"
+                  },
+                  {
+                    "height": "64px"
+                  },
+                  {
+                    "color": "#000000"
+                  }
+                ],
+                "label": [
+                  {
+                    "grid-area": "l"
+                  },
+                  {
+                    "font-size": "14px"
+                  },
+                  {
+                    "padding-top": "6px"
+                  }
+                ],
+                "card": [
+                  {
+                    "background-color": "[[[\n  return entity.state === 'open' ? '#ddffdd' : '#ffdddd';\n]]]\n"
+                  },
+                  {
+                    "border-radius": "12px"
+                  },
+                  {
+                    "padding": "16px"
+                  }
+                ]
+              }
+            },
+            {
+              "cards": [
+                {
+                  "entities": [
+                    {
+                      "entity": "light.front_room_light",
+                      "name": "Font Room Chandelier"
+                    },
+                    {
+                      "entity": "light.kitchen_table_light"
+                    },
+                    {
+                      "entity": "light.wled_left_window"
+                    },
+                    {
+                      "entity": "light.wled_right_window"
+                    },
+                    {
+                      "entity": "light.front_door"
+                    },
+                    {
+                      "entity": "light.driveway_left"
+                    },
+                    {
+                      "entity": "light.driveway_right"
+                    },
+                    {
+                      "entity": "light.garbage_can_area"
+                    },
+                    {
+                      "entity": "light.front_of_the_house"
+                    },
+                    {
+                      "entity": "switch.garage_lights"
+                    },
+                    {
+                      "entity": "light.2ndgaragelights_2nd_garage_lights",
+                      "name": "2nd Garage Lights"
+                    }
+                  ],
+                  "title": "Lights",
+                  "type": "entities",
+                  "show_header_toggle": false,
+                  "state_color": true
+                },
+                {
+                  "entities": [
+                    {
+                      "customTheme": false,
+                      "entity": "fan.garage_afs",
+                      "name": "Garage Air Filter",
+                      "type": "custom:fan-control-entity-row"
+                    },
+                    {
+                      "entity": "switch.garage_fan"
+                    }
+                  ],
+                  "show_header_toggle": false,
+                  "title": "Garage AFS",
+                  "type": "entities"
+                },
+                {
+                  "cards": [
+                    {
+                      "color_type": "blank-card",
+                      "type": "custom:button-card"
+                    },
+                    {
+                      "color": "rgb(25, 155, 20)",
+                      "entity": "input_boolean.timer_30min",
+                      "icon": "mdi:checkbox-blank-circle",
+                      "name": 30,
+                      "state": [
+                        {
+                          "color": "rgb(61,61,61)",
+                          "icon": "mdi:checkbox-blank-circle-outline",
+                          "value": "off"
+                        }
+                      ],
+                      "styles": {
+                        "card": [
+                          {
+                            "height": "40px"
+                          },
+                          {
+                            "width": "40px"
+                          }
+                        ]
+                      },
+                      "type": "custom:button-card"
+                    },
+                    {
+                      "color": "rgb(25, 155, 20)",
+                      "entity": "input_boolean.timer_60min",
+                      "icon": "mdi:checkbox-blank-circle",
+                      "name": 60,
+                      "state": [
+                        {
+                          "color": "rgb(61,61,61)",
+                          "icon": "mdi:checkbox-blank-circle-outline",
+                          "value": "off"
+                        }
+                      ],
+                      "styles": {
+                        "card": [
+                          {
+                            "height": "40px"
+                          },
+                          {
+                            "width": "40px"
+                          }
+                        ]
+                      },
+                      "type": "custom:button-card"
+                    },
+                    {
+                      "color": "rgb(25, 155, 20)",
+                      "entity": "input_boolean.timer_90min",
+                      "icon": "mdi:checkbox-blank-circle",
+                      "name": 90,
+                      "state": [
+                        {
+                          "color": "rgb(61,61,61)",
+                          "icon": "mdi:checkbox-blank-circle-outline",
+                          "value": "off"
+                        }
+                      ],
+                      "styles": {
+                        "card": [
+                          {
+                            "height": "40px"
+                          },
+                          {
+                            "width": "40px"
+                          }
+                        ]
+                      },
+                      "type": "custom:button-card"
+                    },
+                    {
+                      "color_type": "blank-card",
+                      "type": "custom:button-card"
+                    }
+                  ],
+                  "type": "horizontal-stack"
+                }
+              ],
+              "type": "vertical-stack"
+            },
+            {
+              "type": "entities",
+              "entities": [
+                "sensor.mainstogrid_energy_today"
+              ]
+            },
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "detail": 1,
+                  "entity": "sensor.frontyard_temperature",
+                  "name": "Front"
+                },
+                {
+                  "graph": "line",
+                  "type": "sensor",
+                  "detail": 1,
+                  "entity": "sensor.backyard_temperature",
+                  "name": "Back"
+                }
+              ],
+              "title": "Outside Temps"
+            },
+            {
+              "cards": [
+                {
+                  "entity": "weather.my_weather",
+                  "type": "weather-forecast",
+                  "forecast_type": "daily"
+                },
+                {
+                  "backdrop": {
+                    "day": "var(--primary-color)",
+                    "night": "#40445a"
+                  },
+                  "entity": "weather.my_weather",
+                  "name": "at home",
+                  "type": "custom:simple-weather-card"
+                }
+              ],
+              "type": "vertical-stack"
+            },
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "custom:mini-graph-card",
+                  "entities": [
+                    "sensor.ambientweather_f007th_frontyard_frontyard_temperature"
+                  ],
+                  "name": "Front Yard Temp",
+                  "hours_to_show": 24,
+                  "points_per_hour": 60,
+                  "decimals": 1,
+                  "extrema": true,
+                  "lower_bound": 25
+                },
+                {
+                  "type": "custom:mini-graph-card",
+                  "entities": [
+                    "sensor.ambientweather_f007th_backyard_backyard_temperature"
+                  ],
+                  "name": "Back Yard Temp",
+                  "hours_to_show": 24,
+                  "points_per_hour": 60,
+                  "decimals": 1,
+                  "extrema": true,
+                  "lower_bound": 25
+                }
+              ]
+            },
+            {
+              "type": "entities",
+              "entities": [
+                {
+                  "entity": "sensor.weatherstation_temperature",
+                  "name": "Temp"
+                },
+                {
+                  "entity": "sensor.weatherstation_humidity",
+                  "name": "Humidity"
+                },
+                {
+                  "entity": "sensor.rain_24h",
+                  "name": "24 Hour Rain",
+                  "icon": "mdi:weather-rainy"
+                },
+                {
+                  "entity": "sensor.rain_season",
+                  "name": "Season Rain Total"
+                },
+                {
+                  "entity": "sensor.wind_avg_mph",
+                  "name": "Wind Average"
+                },
+                {
+                  "entity": "sensor.wind_max_mph",
+                  "name": "Wind Max"
+                },
+                {
+                  "entity": "sensor.weatherstation_light",
+                  "name": "Light "
+                },
+                {
+                  "entity": "sensor.weatherstation_uv_index",
+                  "name": "UV Index"
+                }
+              ],
+              "title": "Weather Station"
+            },
+            {
+              "type": "custom:weather-card",
+              "entity": "weather.my_weather",
+              "number_of_forecasts": "5",
+              "current": true,
+              "details": true,
+              "forecast": true,
+              "hourly_forecast": true
+            },
+            {
+              "type": "entities",
+              "entities": [
+                {
+                  "entity": "sensor.temp_humidity_attic_humidity",
+                  "name": "Attic - Humidity"
+                },
+                {
+                  "entity": "sensor.attic_temp_degf",
+                  "name": "Attic - Temp"
+                },
+                {
+                  "entity": "sensor.temp_humidity_attic_voltage",
+                  "name": "Attic - Battery",
+                  "icon": "mdi:battery-bluetooth-variant"
+                },
+                {
+                  "entity": "sensor.ams_1_temp_degf",
+                  "name": "AMS - Temp"
+                },
+                {
+                  "entity": "sensor.ams_1_humidity",
+                  "name": "AMS - Humidity"
+                },
+                {
+                  "entity": "sensor.ams_1_voltage",
+                  "name": "AMS - Battery",
+                  "icon": "mdi:battery-bluetooth-variant"
+                }
+              ],
+              "title": "Temp/Humidity - Attic & Shop"
+            },
+            {
+              "type": "custom:aarlo-glance",
+              "entities": [
+                {
+                  "entity": "camera.aarlo_pond",
+                  "name": "Pond"
+                },
+                {
+                  "entity": "camera.aarlo_front_stairs",
+                  "name": "Front Stairs"
+                },
+                {
+                  "entity": "camera.aarlo_right_driveway",
+                  "name": "Right Driveway"
+                }
+              ],
+              "global": "active,blended",
+              "image_view": "direct",
+              "image_top": "name,status",
+              "image_bottom": "motion,library,stream,snapshot,battery",
+              "image_click": "recordings",
+              "library_sizes": "3,4,2"
+            },
+            {
+              "type": "entities",
+              "title": "Set Hue scenes",
+              "show_header_toggle": false,
+              "card_mod": {
+                "style": ".card-header {\n  background-color: var(--background-color-off);\n  color: var(--text-color-off);\n  padding-top: 0px;\n  padding-bottom: 0px;\n  margin: 0px 0px 16px 0px;\n}\nha-card {\n  margin: 0px 0px 16px 0px; /* create space before next card in view*/\n}\n"
+              },
+              "entities": [
+                "input_select.hue_group",
+                {
+                  "type": "custom:fold-entity-row",
+                  "card_mod": {
+                    "style": "#measure {\n  max-height: 300px;\n  overflow-x: hidden;\n  overflow-y: scroll;\n}\n"
+                  },
+                  "head": {
+                    "type": "section",
+                    "label": "Regular scenes",
+                    "card_mod": {
+                      "style": ".label {\n  margin-left: 0px;\n}\n"
+                    }
+                  },
+                  "padding": 0,
+                  "no_animation": true,
+                  "entities": [
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "entities",
+                        "card_mod": {
+                          "style": "ha-card {\n  box-shadow: none;\n  margin: 0px -16px;\n}\n"
+                        }
+                      },
+                      "show_empty": false,
+                      "filter": {
+                        "template": "{% set hue_group = states('input_select.hue_group') %}\n{% set ns = namespace(scenes=[]) %}\n{%- for s in states.scene\n  if hue_group == s.attributes.group_name and\n      s.attributes.is_dynamic != true %}\n    {% set ns.scenes = ns.scenes + [{'entity':s.entity_id,\n      'name': s.object_id.split(hue_group|slugify +'_')[1]|capitalize|replace('_',' ') }] %}\n{%- endfor %}\n{{ns.scenes}}\n"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "type": "conditional",
+                  "conditions": [
+                    {
+                      "entity": "binary_sensor.selected_hue_group_has_active_scenes_available",
+                      "state": "on"
+                    }
+                  ],
+                  "row": {
+                    "type": "custom:fold-entity-row",
+                    "head": {
+                      "type": "section",
+                      "label": "Dynamic scenes",
+                      "card_mod": {
+                        "style": ".label {\n  margin-left: 0px;\n}\n"
+                      }
+                    },
+                    "padding": 0,
+                    "no_animation": true,
+                    "entities": [
+                      {
+                        "type": "custom:auto-entities",
+                        "card": {
+                          "type": "entities",
+                          "card_mod": {
+                            "style": "ha-card {\n  box-shadow: none;\n  margin: 0px -16px;\n}\n.card-content {\n   max-height: 250px;\n   overflow-y: scroll;\n}\n"
+                          }
+                        },
+                        "filter": {
+                          "template": "{% set hue_group = states('input_select.hue_group') %}\n{% set ns = namespace(scenes=[]) %}\n{%- for s in states.scene\n  if hue_group == s.attributes.group_name and\n      s.attributes.is_dynamic == true %}\n    {% set ns.scenes = ns.scenes + [{'entity':s.entity_id,\n      'name': s.object_id.split(hue_group|slugify +'_')[1]|capitalize|replace('_',' ') }] %}\n{%- endfor %}\n{{ns.scenes}}\n"
+                        }
+                      },
+                      "input_select.hue_dynamic_scene",
+                      "input_number.hue_dynamic_scene_speed",
+                      "input_number.hue_dynamic_scene_brightness",
+                      {
+                        "type": "conditional",
+                        "conditions": [
+                          {
+                            "entity": "binary_sensor.selected_hue_group_active_scene",
+                            "state": "off"
+                          }
+                        ],
+                        "row": {
+                          "entity": "script.activate_hue_dynamic_scene",
+                          "icon": "mdi:play",
+                          "action_name": "play"
+                        }
+                      },
+                      {
+                        "type": "conditional",
+                        "conditions": [
+                          {
+                            "entity": "binary_sensor.selected_hue_group_active_scene",
+                            "state": "on"
+                          }
+                        ],
+                        "row": {
+                          "entity": "script.deactivate_hue_dynamic_scene",
+                          "icon": "mdi:stop",
+                          "action_name": "stop"
+                        }
+                      },
+                      {
+                        "type": "conditional",
+                        "conditions": [
+                          {
+                            "entity": "binary_sensor.hue_groups_dynamic_scening",
+                            "state": "on"
+                          }
+                        ],
+                        "row": {
+                          "type": "custom:fold-entity-row",
+                          "head": {
+                            "type": "section",
+                            "label": "Currently scening group",
+                            "card_mod": {
+                              "style": ".label {\n  margin-left: 0px;\n}\n"
+                            }
+                          },
+                          "padding": 0,
+                          "no_animation": true,
+                          "entities": [
+                            {
+                              "type": "custom:auto-entities",
+                              "card": {
+                                "type": "entities",
+                                "card_mod": {
+                                  "style": "ha-card {\n  box-shadow: none;\n  margin: 0px -16px;\n}\n"
+                                }
+                              },
+                              "show_empty": false,
+                              "filter": {
+                                "include": [
+                                  {
+                                    "attributes": {
+                                      "dynamics": true
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "type": "conditional",
+                        "conditions": [
+                          {
+                            "entity": "binary_sensor.hue_groups_dynamic_scening",
+                            "state": "on"
+                          }
+                        ],
+                        "row": {
+                          "type": "custom:fold-entity-row",
+                          "head": {
+                            "type": "section",
+                            "label": "Currently scening lights",
+                            "card_mod": {
+                              "style": ".label {\n  margin-left: 0px;\n}\n"
+                            }
+                          },
+                          "padding": 0,
+                          "no_animation": true,
+                          "entities": [
+                            {
+                              "type": "custom:auto-entities",
+                              "card": {
+                                "type": "entities",
+                                "card_mod": {
+                                  "style": "ha-card {\n  box-shadow: none;\n  margin: 0px -16px;\n}\n"
+                                }
+                              },
+                              "show_empty": false,
+                              "filter": {
+                                "include": [
+                                  {
+                                    "attributes": {
+                                      "dynamics": "dynamic_palette"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "type": "custom:template-entity-row",
+                  "entity": "light.{{states('input_select.hue_group')|slugify}}\n",
+                  "secondary": "{% set x = ['unknown','unavailable'] %} {% if states('input_select.hue_group') not in x %} {% set object = states('input_select.hue_group')|slugify %} {% set group = 'light.' + object %}\n  {% set bri = state_attr(group,'brightness') %}\n  {% set rgb = state_attr(group,'rgb_color') %}\n  {% if states(group) == 'on' %} Bri: {{bri}}, Rgb: {{rgb}}\n  {% else %} Off\n  {% endif %} since {{relative_time(states[group].last_changed) if (states[group]\n    and states[group].last_changed not in x) else 'Initializing....'}}\n{% else %} Not yet set {% endif %}\n",
+                  "toggle": true
+                },
+                {
+                  "type": "custom:fold-entity-row",
+                  "head": {
+                    "type": "section",
+                    "label": "Automations",
+                    "card_mod": {
+                      "style": ".label {\n  margin-left: 0px;\n}\n"
+                    }
+                  },
+                  "padding": 0,
+                  "no_animation": true,
+                  "entities": [
+                    {
+                      "entity": "automation.auto_populate_hue_group_input_select",
+                      "secondary_info": "last-triggered"
+                    },
+                    {
+                      "entity": "automation.auto_populate_hue_dynamic_scene_input_select",
+                      "secondary_info": "last-triggered"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "square": false,
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "custom:config-template-card",
+                  "entities": [
+                    {
+                      "entity": "sensor.days_until_garbage"
+                    }
+                  ],
+                  "variables": {
+                    "DAYS": "states['sensor.days_until_garbage'].attributes['days']+'d'"
+                  },
+                  "title": "Garbage Schedule",
+                  "card": {
+                    "type": "picture-entity",
+                    "entity": "sensor.days_until_garbage",
+                    "name": "${DAYS}",
+                    "show_name": true,
+                    "show_state": false,
+                    "state_image": {
+                      "0": "/local/images/general_today.png",
+                      "1": "/local/images/general_tomorrow.png",
+                      "2": "/local/images/general_off.png"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:config-template-card",
+                  "entities": [
+                    {
+                      "entity": "sensor.days_until_recycling"
+                    }
+                  ],
+                  "variables": {
+                    "DAYS": "states['sensor.days_until_recycling'].attributes['days']+'d'"
+                  },
+                  "title": "Garbage Schedule",
+                  "card": {
+                    "type": "picture-entity",
+                    "entity": "sensor.days_until_recycling",
+                    "name": "${DAYS}",
+                    "show_name": true,
+                    "show_state": false,
+                    "state_image": {
+                      "0": "/local/images/paper_today.png",
+                      "1": "/local/images/paper_tomorrow.png",
+                      "2": "/local/images/paper_off.png"
+                    }
+                  }
+                }
+              ],
+              "columns": 2,
+              "title": "Garbage Schedule"
+            }
+          ]
+        },
+        {
+          "title": "Outside",
+          "path": "outside",
+          "icon": "mdi:grass",
+          "badges": [],
+          "cards": [
+            {
+              "type": "custom:opensprinkler-card",
+              "device": "d0ece00918f34bc1b9dd7dd6937480ab",
+              "extra_entities": [
+                "sensor.front_left_station_status",
+                "sensor.front_middle_station_status",
+                "sensor.front_right_station_status",
+                "sensor.backyard_right_station_status",
+                "sensor.pond_station_status",
+                "sensor.backyard_left_station_status"
+              ]
+            },
+            {
+              "type": "entities",
+              "entities": [
+                "binary_sensor.back_yard_program_running",
+                "binary_sensor.backyard_left_station_running",
+                "sensor.backyard_left_station_status",
+                "binary_sensor.backyard_right_station_running",
+                "sensor.backyard_right_station_status",
+                "binary_sensor.front_yard_program_running",
+                "binary_sensor.front_left_station_running",
+                "sensor.front_left_station_status",
+                "binary_sensor.front_middle_station_running",
+                "sensor.front_middle_station_status",
+                "binary_sensor.front_right_station_running",
+                "sensor.front_right_station_status",
+                {
+                  "entity": "sensor.opensprinkler_flow_rate",
+                  "name": "Flow Rate"
+                },
+                {
+                  "entity": "sensor.opensprinkler_last_run",
+                  "name": "Last Run"
+                },
+                {
+                  "entity": "binary_sensor.opensprinkler_rain_delay_active",
+                  "name": "Rain Delay Active"
+                },
+                {
+                  "entity": "sensor.opensprinkler_rain_delay_stop_time",
+                  "name": "Rain Delay Stop Time"
+                },
+                {
+                  "entity": "binary_sensor.opensprinkler_sensor_1_active",
+                  "name": "Sensor 1 Active"
+                },
+                {
+                  "entity": "binary_sensor.opensprinkler_sensor_2_active",
+                  "name": "Sensor 2 Active"
+                },
+                {
+                  "entity": "sensor.opensprinkler_water_level",
+                  "name": "Water Level"
+                },
+                "binary_sensor.pond_station_running",
+                "sensor.pond_station_status",
+                "binary_sensor.s07_station_running",
+                "sensor.s07_station_status",
+                "binary_sensor.s08_station_running",
+                "sensor.s08_station_status"
+              ],
+              "title": "OpenSprinkler"
+            },
+            {
+              "type": "entities",
+              "entities": [
+                "switch.back_yard_program_enabled",
+                "switch.backyard_left_station_enabled",
+                "switch.backyard_right_station_enabled",
+                "switch.front_yard_program_enabled",
+                "switch.front_left_station_enabled",
+                "switch.front_middle_station_enabled",
+                "switch.front_right_station_enabled",
+                {
+                  "entity": "switch.opensprinkler_enabled",
+                  "name": "Enabled"
+                },
+                "switch.pond_station_enabled",
+                "switch.s07_station_enabled",
+                "switch.s08_station_enabled"
+              ],
+              "title": "OpenSprinkler"
+            },
+            {
+              "type": "entities",
+              "entities": [
+                "sensor.ac_current_scale",
+                "sensor.ac_frequency",
+                "sensor.ac_frequency_scale",
+                "sensor.ac_phase_a_current",
+                "sensor.ac_phase_ab_voltage",
+                "sensor.ac_total_current",
+                "sensor.ac_voltage_scale",
+                "sensor.dc_current",
+                "sensor.dc_current_scale",
+                "sensor.dc_power",
+                "sensor.dc_power_scale",
+                "sensor.dc_voltage",
+                "sensor.dc_voltage_scale",
+                "sensor.energy_total",
+                "sensor.energy_total_scale",
+                "sensor.phase_a_to_neutral_voltage",
+                "sensor.phase_b_to_neutral_voltage",
+                "sensor.se_inverter_model",
+                "sensor.se_inverter_serial",
+                "sensor.se_inverter_status",
+                "sensor.status",
+                "sensor.sunspec_did",
+                "sensor.temperature_2",
+                "sensor.total_apparent_power",
+                "sensor.total_apparent_power_scale",
+                "sensor.total_power",
+                "sensor.total_power_factor",
+                "sensor.total_power_factor_scale",
+                "sensor.total_power_reactive",
+                "sensor.total_power_scale",
+                "sensor.total_reactive_power_scale"
+              ],
+              "title": "solaredge-inverter"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
