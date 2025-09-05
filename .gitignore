@@ -1,15 +1,40 @@
-# Core HA runtime artifacts
+# 🔒 Sensitive files
+secrets.yaml
+.secrets/
+.cloud/
+.google.token
+.spotify-token-cache
+.homekit.state
+
+# 🗃️ Runtime artifacts
 *.db
 *.log
 *.pickle*
 *.bak
-secrets.yaml
-.secrets/
-.storage/
-.cloud/
+home-assistant*.*
 tts/
+.aarlo/
+
+# 🧪 Volatile system files (not useful for tracking config changes)
+.storage/
+# ⬅️ Optional: If you want to track dashboards, whitelist specific files below
+
+# 🧠 Preserve dashboard logic
+!.storage/lovelace
+!.storage/lovelace_dashboards
+!.storage/lovelace_resources
+!.storage/lovelace_views
+
+# 🧰 Custom components and add-ons (optional: track if you modify them)
 community/
 custom_components/
 appdaemon/
-home-assistant*.*
-.aarlo/
+
+# 🧼 Misc IDE/editor artifacts
+.vscode/
+__pycache__/
+*.pyc
+*.swp
+*.tmp
+*.DS_Store
+
