@@ -1,36 +1,35 @@
-- platform: template
-  sensors:
-    garage_pressure_rounded:
-      friendly_name: "Garage Pressure Rounded"
-      availability_template: "{{ states('sensor.garage_pressure') | is_number }}"
-      value_template: >-
-        {% set v = states('sensor.garage_pressure') | float(0) %}
-        {% set u = (state_attr('sensor.garage_pressure','unit_of_measurement') or '') | lower %}
-        {% if u in ['hpa','mbar'] %}
-          {{ (v * 0.02953) | round(1) }}   {# hPa → inHg #}
-        {% elif u == 'pa' %}
-          {{ (v * 0.0002953) | round(1) }} {# Pa → inHg #}
-        {% else %}
-          {{ v | round(1) }}               {# assume already in inHg #}
-        {% endif %}
-      unit_of_measurement: "inHg"
-      icon_template: mdi:gauge
+# - platform: template
+#   sensors:
+#     garage_pressure_rounded:
+#       friendly_name: "Garage Pressure Rounded"
+#       availability_template: "{{ states('sensor.garage_pressure') | is_number }}"
+#       value_template: >-
+#         {% set v = states('sensor.garage_pressure') | float(0) %}
+#         {% set u = (state_attr('sensor.garage_pressure','unit_of_measurement') or '') | lower %}
+#         {% if u in ['hpa','mbar'] %}
+#           {{ (v * 0.02953) | round(1) }}   {# hPa → inHg #}
+#         {% elif u == 'pa' %}
+#           {{ (v * 0.0002953) | round(1) }} {# Pa → inHg #}
+#         {% else %}
+#           {{ v | round(1) }}               {# assume already in inHg #}
+#         {% endif %}
+#       unit_of_measurement: "inHg"
+#       icon_template: mdi:gauge
 
-
-- platform: template
-  sensors:
-    garage_door_status_verbose:
-      friendly_name: "Garage Door Status"
-      value_template: >
-        {% set state = states.cover.garage_door.state %}
-        {% set time = (states.cover.garage_door.last_changed | as_local).strftime('%H:%M') %}
-        {% if state == 'open' %}
-          🚪 Opened at {{ time }}
-        {% elif state == 'closed' %}
-          🔒 Closed at {{ time }}
-        {% else %}
-          ❓ Unknown state
-        {% endif %}
+# - platform: template
+#   sensors:
+#     garage_door_status_verbose:
+#       friendly_name: "Garage Door Status"
+#       value_template: >
+#         {% set state = states.cover.garage_door.state %}
+#         {% set time = (states.cover.garage_door.last_changed | as_local).strftime('%H:%M') %}
+#         {% if state == 'open' %}
+#           🚪 Opened at {{ time }}
+#         {% elif state == 'closed' %}
+#           🔒 Closed at {{ time }}
+#         {% else %}
+#           ❓ Unknown state
+#         {% endif %}
 
 # - platform: mqtt
 #   name: "Garage Temperature"
@@ -83,45 +82,3 @@
 #     - temperature
 #     - humidity
 #     - air_quality
-
-# - platform: template
-#   sensors:
-#     ambientweather_sensor_channel_1:
-#       friendly_name: "Backyard Weather Sensor"
-#       value_template: >
-#         {% if states('sensor.ambientweather_sensor_channel_1') != 'unknown' %}
-#           {{ states('sensor.ambientweather_sensor_channel_1') }}
-#         {% endif %}
-#       attribute_templates:
-#         humidity: >
-#           {% if states.sensor.ambientweather_sensor_channel_1.attributes.humidity != None %}
-#             {{ states.sensor.ambientweather_sensor_channel_1.attributes.humidity }}
-#           {% endif %}
-#         temperature: >
-#           {% if states.sensor.ambientweather_sensor_channel_1.attributes.temperature_C != None %}
-#             {{ states.sensor.ambientweather_sensor_channel_1.attributes.temperature_C }}
-#           {% endif %}
-#         battery_ok: >
-#           {% if states.sensor.ambientweather_sensor_channel_1.attributes.battery_ok != None %}
-#             {{ states.sensor.ambientweather_sensor_channel_1.attributes.battery_ok }}
-#           {% endif %}
-
-#     ambientweather_sensor_channel_2:
-#       friendly_name: "Frontyard Weather Sensor"
-#       value_template: >
-#         {% if states('sensor.ambientweather_sensor_channel_2') != 'unknown' %}
-#           {{ states('sensor.ambientweather_sensor_channel_2') }}
-#         {% endif %}
-#       attribute_templates:
-#         humidity: >
-#           {% if states.sensor.ambientweather_sensor_channel_2.attributes.humidity != None %}
-#             {{ states.sensor.ambientweather_sensor_channel_2.attributes.humidity }}
-#           {% endif %}
-#         temperature: >
-#           {% if states.sensor.ambientweather_sensor_channel_2.attributes.temperature_C != None %}
-#             {{ states.sensor.ambientweather_sensor_channel_2.attributes.temperature_C }}
-#           {% endif %}
-#         battery_ok: >
-#           {% if states.sensor.ambientweather_sensor_channel_2.attributes.battery_ok != None %}
-#             {{ states.sensor.ambientweather_sensor_channel_2.attributes.battery_ok }}
-#           {% endif %}

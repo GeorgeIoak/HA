@@ -1,0 +1,86 @@
+- sensor:
+    - name: "Attic Temp (°F)"
+      unique_id: attic_temperature_f
+      unit_of_measurement: "°F"
+      device_class: temperature
+      state_class: measurement
+      state: >
+        {{ (states('sensor.temp_humidity_attic_temperature') | float * 1.8 + 32) | round(1) }}
+
+    - name: "AMS 1 Temp (°F)"
+      unique_id: ams_1_temperature_f
+      unit_of_measurement: "°F"
+      device_class: temperature
+      state_class: measurement
+      state: >
+        {{ (states('sensor.ams_1_temperature') | float * 1.8 + 32) | round(1) }}
+
+- binary_sensor:
+    - unique_id: selected_hue_group_active_scene
+      name: "Selected Hue group active scene"
+      state: >
+        {% set select = states('input_select.hue_group') | slugify %}
+        {% set group = 'light.' ~ select %}
+        {{ is_state_attr(group, 'dynamics', true) }}
+
+    - unique_id: selected_hue_group_has_active_scenes_available
+      name: "Selected Hue group has active scenes available"
+      state: >
+        {% set hue_group = states('input_select.hue_group') %}
+        {{ states.scene
+              | selectattr('attributes.group_name','eq', hue_group)
+              | selectattr('attributes.is_dynamic','eq', true)
+              | list | length != 0 }}
+
+    - unique_id: hue_groups_dynamic_scening
+      name: "Hue groups dynamic scening"
+      state: >
+        {{ states.light
+              | selectattr('attributes.dynamics','eq', true)
+              | list | length != 0 }}
+- sensor:
+    - name: "Days Until Garbage"
+      unique_id: days_until_garbage
+      state: >
+        {{ min(((state_attr('calendar.garbage', 'start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int, 2) }}
+      attributes:
+        days: >
+          {{ ((state_attr('calendar.garbage', 'start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int }}
+
+    - name: "Days Until Recycling"
+      unique_id: days_until_recycling
+      state: >
+        {{ min(((state_attr('calendar.recycling', 'start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int, 2) }}
+      attributes:
+        days: >
+          {{ ((state_attr('calendar.recycling', 'start_time') | as_timestamp - today_at('00:00') | as_timestamp) / 86400) | int }}
+
+- sensor:
+    - name: "Garage Pressure Rounded"
+      unique_id: garage_pressure_rounded
+      unit_of_measurement: "inHg"
+      icon: mdi:gauge
+      availability: "{{ states('sensor.garage_pressure') | is_number }}"
+      state: >
+        {% set v = states('sensor.garage_pressure') | float(0) %}
+        {% set u = (state_attr('sensor.garage_pressure','unit_of_measurement') or '') | lower %}
+        {% if u in ['hpa','mbar'] %}
+          {{ (v * 0.02953) | round(1) }}   {# hPa → inHg #}
+        {% elif u == 'pa' %}
+          {{ (v * 0.0002953) | round(1) }} {# Pa → inHg #}
+        {% else %}
+          {{ v | round(1) }}               {# assume already in inHg #}
+        {% endif %}
+
+    - name: "Garage Door Status"
+      unique_id: garage_door_status_verbose
+      state: >
+        {% set state = states.cover.garage_door.state %}
+        {% set time = (states.cover.garage_door.last_changed | as_local).strftime('%H:%M') %}
+        {% if state == 'open' %}
+          🚪 Opened at {{ time }}
+        {% elif state == 'closed' %}
+          🔒 Closed at {{ time }}
+        {% else %}
+          ❓ Unknown state
+        {% endif %}
