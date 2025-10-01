@@ -3,9 +3,17 @@
 #
 # Weather package:
 # - MQTT sensors (rtl_433: Ambientweather F007TH + Cotech 367959 WeatherStation)
-# - Rain: cumulative(mm) ➜ delta(mm) ➜ delta(in) ➜ 24h/today/season (INCHES)
-# - Template weather ("My Weather"): Tomorrow.io → NWS → Home (first available)
+# - Rain:
+#     * Rain Cumulative (in) from station cumulative mm → total_increasing
+#     * Utility meters "Rain Today" (daily) and "Rain Season" (resets Jul 1)
+#     * Rain Delta (in) with deadband + spike guard for 24h rolling sum
 # - Wind conversions to mph (view sensors)
+# - Template weather ("My Weather"): Tomorrow.io → NWS → Home (first available)
+# - Maintenance tools:
+#     * input_boolean.rain_maintenance_mode (toggles UI buttons)
+#     * input_number.rain_cum_baseline_in (stores cumulative at season baseline)
+#     * automation to capture baseline on season reset (Jul 1 or manual reset)
+#     * scripts to calibrate/zero meters
 ################################################################################
 
 ###############################################################################
@@ -125,7 +133,7 @@ mqtt:
       unit_of_measurement: "mm"
       device_class: precipitation
       state_class: measurement
-      value_template: "{{ value | float(0) | round(1) }}"
+      value_template: "{{ value | float(0) }}"   # <— was | round(1)
       unique_id: Cotech-367959-WeatherStation-R
       device:
         identifiers: [Cotech-367959-WeatherStation]
@@ -200,20 +208,28 @@ mqtt:
 ###############################################################################
 template:
   - sensor:
+      # Convert station cumulative rain mm → inches; mark as total_increasing.
+      - name: "Rain Cumulative (in)"
+        unique_id: rain_cumulative_in
+        unit_of_measurement: "in"
+        device_class: precipitation
+        state_class: total_increasing
+        state: "{{ (states('sensor.weatherstation_rainfall') | float(0) / 25.4) | round(2) }}"
+
+      # Guarded per-event delta in inches for charts / 24h rolling sum
       - name: "Rain Delta (in)"
         unique_id: rain_delta_in_guarded
         unit_of_measurement: "in"
         device_class: precipitation
         state_class: measurement
         state: >-
-          {# Use 0.0 when the source is unknown/unavailable so this sensor stays available #}
           {% set cum_mm = states('sensor.weatherstation_rainfall') | float(0) %}
           {% set last_mm = this.attributes.get('last_total_mm', cum_mm) | float(0) %}
           {% set raw_mm = cum_mm - last_mm %}
           {% set inc_mm = 0 if raw_mm < 0 else raw_mm %}
-          {# drop obviously bad spikes (> ~2 in = 50.8 mm) #}
-          {% set inc_mm = 0 if inc_mm > 50.8 else inc_mm %}
-          {{ (inc_mm / 25.4) | round(2) }}
+          {# ignore tiny jitter (<0.3 mm ≈ 0.01 in) and big spikes (>50.8 mm ≈ 2 in) #}
+          {% set inc_mm = 0 if inc_mm < 0.3 or inc_mm > 50.8 else inc_mm %}
+          {{ (inc_mm / 25.4) | round(3) }}
         attributes:
           last_total_mm: "{{ states('sensor.weatherstation_rainfall') | float(0) }}"
 
@@ -240,7 +256,7 @@ template:
           {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
 
 ###############################################################################
-# Rolling 24-hour rain total (inches)
+# Rolling 24-hour rain total (inches) from guarded per-event deltas
 ###############################################################################
 sensor:
   - platform: statistics
@@ -253,7 +269,8 @@ sensor:
     sampling_size: 2000
 
 ###############################################################################
-# Utility meters (inches) — daily & seasonal (reset Jul 1)
+# Utility meters (inches) — daily & seasonal (reset Jul 1 at 00:00 local)
+# Source uses the cumulative (total_increasing) sensor; no delta_values.
 ###############################################################################
 utility_meter:
   rain_today:
@@ -268,28 +285,23 @@ utility_meter:
     unique_id: rain_season_in
     name: "Rain Season"
     delta_values: true
-    cron: "0 0 1 7 *"  # reset Jul 1 at 00:00 local
+    cron: "0 0 1 7 *"
 
 ###############################################################################
 # Weather template entity ("My Weather")
-#   Picks the first provider that isn't unknown/unavailable/empty
 ###############################################################################
 weather:
   - platform: template
     name: "My Weather"
     unique_id: 1d253178-64fe-4482-bc28-f1eae64079ba
-
     condition_template: >-
       {% set order = ['weather.tomorrow_io_daily','weather.nws','weather.home'] %}
-      {% set chosen = namespace(id=None) %}
       {% for e in order %}
         {% if states(e) not in ['unknown','unavailable',''] %}
-          {% set chosen.id = e %}
+          {{ states(e) }}
           {% break %}
         {% endif %}
       {% endfor %}
-      {{ states(chosen.id) if chosen.id else 'unknown' }}
-
     temperature_template: "{{ states('sensor.weatherstation_temperature') | float(0) }}"
     humidity_template: "{{ states('sensor.weatherstation_humidity') | float(0) }}"
     pressure_template: "{{ (states('sensor.garage_pressure') | float(0)) | round(1) }}"
@@ -298,11 +310,109 @@ weather:
     ozone_template: "{{ states('sensor.current_ozone_level') | float(0) }}"
     visibility_template: >-
       {% set order = ['weather.tomorrow_io_daily','weather.nws','weather.home'] %}
-      {% set chosen = namespace(id=None) %}
       {% for e in order %}
         {% if states(e) not in ['unknown','unavailable',''] %}
-          {% set chosen.id = e %}
+          {{ state_attr(e, 'visibility') }}
           {% break %}
         {% endif %}
       {% endfor %}
-      {{ state_attr(chosen.id, 'visibility') if chosen.id else None }}
+
+###############################################################################
+# Maintenance controls (UI toggle + stored baseline)
+###############################################################################
+input_boolean:
+  rain_maintenance_mode:
+    name: Rain Maintenance Mode
+    icon: mdi:wrench
+
+input_number:
+  rain_cum_baseline_in:
+    name: Rain Cumulative Baseline (in)
+    min: 0
+    max: 999
+    step: 0.01
+    mode: box
+
+###############################################################################
+# Automation: capture baseline on season reset (scheduled or manual)
+###############################################################################
+automation:
+  - alias: Rain – Capture baseline at scheduled season reset
+    id: rain_capture_baseline_on_cron_reset
+    mode: single
+    trigger:
+      # Jul 1 at 00:00 local (matches the utility_meter 'cron' reset)
+      - platform: time
+        at: "00:00:00"
+    condition:
+      - condition: template
+        value_template: "{{ now().month == 7 and now().day == 1 }}"
+    action:
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.rain_cum_baseline_in
+        data:
+          value: "{{ states('sensor.rain_cumulative_in') | float(0) }}"
+
+  - alias: Rain – Capture baseline when season is manually reset to 0
+    id: rain_capture_baseline_on_manual_reset
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: sensor.rain_season
+        to: "0"
+      - platform: state
+        entity_id: sensor.rain_season
+        to: "0.0"
+    action:
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.rain_cum_baseline_in
+        data:
+          value: "{{ states('sensor.rain_cumulative_in') | float(0) }}"
+
+###############################################################################
+# Scripts: calibrate/zero tools (call via buttons or Services)
+###############################################################################
+script:
+  rain_calibrate_season_expected:
+    alias: Rain – Calibrate Season to Expected
+    icon: mdi:archive-refresh
+    mode: single
+    sequence:
+      - variables:
+          cum: "{{ states('sensor.rain_cumulative_in') | float(0) }}"
+          base: "{{ states('input_number.rain_cum_baseline_in') | float(0) }}"
+          expected: "{{ (cum - base) | round(2) | float(0) | max(0) }}"
+      - service: utility_meter.calibrate
+        target:
+          entity_id: sensor.rain_season
+        data:
+          value: "{{ expected }}"
+
+  rain_zero_today:
+    alias: Rain – Zero Today
+    icon: mdi:refresh
+    mode: single
+    sequence:
+      - service: utility_meter.calibrate
+        target:
+          entity_id: sensor.rain_today
+        data:
+          value: 0
+
+  rain_zero_season_and_today:
+    alias: Rain – Zero Season & Today
+    icon: mdi:delete-alert
+    mode: single
+    sequence:
+      - service: utility_meter.calibrate
+        target:
+          entity_id: sensor.rain_season
+        data:
+          value: 0
+      - service: utility_meter.calibrate
+        target:
+          entity_id: sensor.rain_today
+        data:
+          value: 0
