@@ -214,7 +214,6 @@ template:
       unit_of_measurement: "mm"
       device_class: precipitation
       state_class: total_increasing
-      restore_state: true
       state: >-
         {% set prev = this.state | float(0) %}
         {% set s = states("sensor.weatherstation_rainfall") %}
