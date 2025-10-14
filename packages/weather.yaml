@@ -208,52 +208,47 @@ mqtt:
 ###############################################################################
 template:
   - sensor:
-      # Convert station cumulative rain mm → inches; mark as total_increasing.
-      - name: "Rain Cumulative (in)"
-        unique_id: rain_cumulative_in
-        unit_of_measurement: "in"
-        device_class: precipitation
-        state_class: total_increasing
-        state: "{{ (states('sensor.weatherstation_rainfall') | float(0) / 25.4) | round(2) }}"
+    # Convert station cumulative rain mm → inches; mark as total_increasing.
+    - name: "WeatherStation Rainfall (mm latched)"
+      unique_id: weatherstation_rainfall_mm_latched
+      unit_of_measurement: "mm"
+      device_class: precipitation
+      state_class: total_increasing
+      restore_state: true
+      state: >-
+        {% set prev = this.state | float(0) %}
+        {% set s = states("sensor.weatherstation_rainfall") %}
+        {% if s in ["unavailable","unknown","none",""] %}
+          {{ prev }}
+        {% else %}
+          {% set v = s | float(0) %}
+          {% set uom = state_attr("sensor.weatherstation_rainfall","unit_of_measurement") | lower %}
+          {% set mm = (v * 25.4) if uom in ["in","inch","inches"] else v %}
+          {{ (mm if mm >= prev else prev) | round(1) }}
+        {% endif %}
 
-      # Guarded per-event delta in inches for charts / 24h rolling sum
-      - name: "Rain Delta (in)"
-        unique_id: rain_delta_in_guarded
-        unit_of_measurement: "in"
-        device_class: precipitation
-        state_class: measurement
-        state: >-
-          {% set cum_mm = states('sensor.weatherstation_rainfall') | float(0) %}
-          {% set last_mm = this.attributes.get('last_total_mm', cum_mm) | float(0) %}
-          {% set raw_mm = cum_mm - last_mm %}
-          {% set inc_mm = 0 if raw_mm < 0 else raw_mm %}
-          {# ignore tiny jitter (<0.3 mm ≈ 0.01 in) and big spikes (>50.8 mm ≈ 2 in) #}
-          {% set inc_mm = 0 if inc_mm < 0.3 or inc_mm > 50.8 else inc_mm %}
-          {{ (inc_mm / 25.4) | round(3) }}
-        attributes:
-          last_total_mm: "{{ states('sensor.weatherstation_rainfall') | float(0) }}"
+    # Wind Avg (mph), convert only if the source reports m/s
+    - name: "Wind Avg (mph)"
+      unique_id: wind_avg_mph_view
+      unit_of_measurement: "mph"
+      device_class: wind_speed
+      state_class: measurement
+      state: >-
+        {% set v = states('sensor.weatherstation_wind_avg') | float(0) %}
+        {% set unit = state_attr('sensor.weatherstation_wind_avg','unit_of_measurement') | lower %}
+        {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
 
-      # Wind Avg (mph), convert only if the source reports m/s
-      - name: "Wind Avg (mph)"
-        unique_id: wind_avg_mph_view
-        unit_of_measurement: "mph"
-        device_class: wind_speed
-        state_class: measurement
-        state: >-
-          {% set v = states('sensor.weatherstation_wind_avg') | float(0) %}
-          {% set unit = state_attr('sensor.weatherstation_wind_avg','unit_of_measurement') | lower %}
-          {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
+    # Wind Max (mph), convert only if the source reports m/s
+    - name: "Wind Max (mph)"
+      unique_id: wind_max_mph_view
+      unit_of_measurement: "mph"
+      device_class: wind_speed
+      state_class: measurement
+      state: >-
+        {% set v = states('sensor.weatherstation_wind_max') | float(0) %}
+        {% set unit = state_attr('sensor.weatherstation_wind_max','unit_of_measurement') | lower %}
+        {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
 
-      # Wind Max (mph), convert only if the source reports m/s
-      - name: "Wind Max (mph)"
-        unique_id: wind_max_mph_view
-        unit_of_measurement: "mph"
-        device_class: wind_speed
-        state_class: measurement
-        state: >-
-          {% set v = states('sensor.weatherstation_wind_max') | float(0) %}
-          {% set unit = state_attr('sensor.weatherstation_wind_max','unit_of_measurement') | lower %}
-          {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
 
 ###############################################################################
 # Rolling 24-hour rain total (inches) from guarded per-event deltas
@@ -274,18 +269,16 @@ sensor:
 ###############################################################################
 utility_meter:
   rain_today:
-    source: sensor.rain_delta_in
-    unique_id: rain_today_in
-    name: "Rain Today"
+    source: sensor.weatherstation_rainfall_mm_latched
     cycle: daily
     delta_values: true
+    periodically_resetting: true
 
   rain_season:
-    source: sensor.rain_delta_in
-    unique_id: rain_season_in
-    name: "Rain Season"
+    source: sensor.weatherstation_rainfall_mm_latched
+    cron: "0 0 1 7 *"   # reset July 1, 00:00
     delta_values: true
-    cron: "0 0 1 7 *"
+    periodically_resetting: true
 
 ###############################################################################
 # Weather template entity ("My Weather")
