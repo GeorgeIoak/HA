@@ -5,7 +5,8 @@
       device_class: temperature
       state_class: measurement
       state: >
-        {{ (states('sensor.temp_humidity_attic_temperature') | float * 1.8 + 32) | round(1) }}
+        {% set c = states('sensor.temp_humidity_attic_temperature') | float(default=None) %}
+        {{ (c * 1.8 + 32) | round(1) if c is not none else None }}
 
     - name: "AMS 1 Temp (°F)"
       unique_id: ams_1_temperature_f
@@ -13,7 +14,8 @@
       device_class: temperature
       state_class: measurement
       state: >
-        {{ (states('sensor.ams_1_temperature') | float * 1.8 + 32) | round(1) }}
+        {% set c = states('sensor.ams_1_temperature') | float(default=None) %}
+        {{ (c * 1.8 + 32) | round(1) if c is not none else None }}
 
 - binary_sensor:
     - unique_id: selected_hue_group_active_scene
@@ -62,7 +64,7 @@
       icon: mdi:gauge
       availability: "{{ states('sensor.garage_pressure') | is_number }}"
       state: >
-        {% set v = states('sensor.garage_pressure') | float(0) %}
+        {% set v = states('sensor.garage_pressure') | float(default=0) %}
         {% set u = (state_attr('sensor.garage_pressure','unit_of_measurement') or '') | lower %}
         {% if u in ['hpa','mbar'] %}
           {{ (v * 0.02953) | round(1) }}   {# hPa → inHg #}

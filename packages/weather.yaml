@@ -133,7 +133,7 @@ mqtt:
       unit_of_measurement: "mm"
       device_class: precipitation
       state_class: measurement
-      value_template: "{{ value | float(0) }}"   # <— was | round(1)
+      value_template: "{{ value | float(0) }}" # <— was | round(1)
       unique_id: Cotech-367959-WeatherStation-R
       device:
         identifiers: [Cotech-367959-WeatherStation]
@@ -203,64 +203,124 @@ mqtt:
         manufacturer: rtl_433
         name: Cotech-367959-WeatherStation
 
+    - name: "WeatherStation Battery"
+      state_topic: "rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/battery_ok"
+      device_class: battery
+      # Converts the '0' (OK) or '1' (Low) from rtl_433 into a percentage
+      value_template: >
+        {% if value == '0' %}
+          100
+        {% else %}
+          10
+        {% endif %}
+      unit_of_measurement: "%"
+      unique_id: Cotech-367959-WeatherStation-B
+      device:
+        identifiers: [Cotech-367959-WeatherStation]
+        model: Cotech-367959
+        manufacturer: rtl_433
+        name: Cotech-367959-WeatherStation
+
 ###############################################################################
 # Helper sensors & conversions
 ###############################################################################
 template:
   - sensor:
-    # Convert station cumulative rain mm → inches; mark as total_increasing.
-    - name: "WeatherStation Rainfall (mm latched)"
-      unique_id: weatherstation_rainfall_mm_latched
-      unit_of_measurement: "mm"
-      device_class: precipitation
-      state_class: total_increasing
-      state: >-
-        {% set prev = this.state | float(0) %}
-        {% set s = states("sensor.weatherstation_rainfall") %}
-        {% if s in ["unavailable","unknown","none",""] %}
-          {{ prev }}
-        {% else %}
-          {% set v = s | float(0) %}
-          {% set uom = state_attr("sensor.weatherstation_rainfall","unit_of_measurement") | lower %}
-          {% set mm = (v * 25.4) if uom in ["in","inch","inches"] else v %}
-          {{ (mm if mm >= prev else prev) | round(1) }}
-        {% endif %}
+      # Monotonic cumulative inches, derived from the station's mm topic
+      - name: "Rain Cumulative (in)"
+        unique_id: rain_cumulative_in
+        unit_of_measurement: "in"
+        device_class: precipitation
+        state_class: total_increasing
+        state: >-
+          {% set current = states('sensor.weatherstation_rainfall') | float(0) %}
+          {% set prev = this.attributes.last_good if 'last_good' in this.attributes else 0 %}
+          {% set prev_val = prev | float(0) %}
+          {{ current if current >= prev_val else prev_val }}
+        attributes:
+          last_good: >-
+            {% set current = states('sensor.weatherstation_rainfall') | float(0) %}
+            {% set prev = this.attributes.last_good if 'last_good' in this.attributes else 0 %}
+            {% set prev_val = prev | float(0) %}
+            {{ current if current >= prev_val else prev_val }}
 
-    # Wind Avg (mph), convert only if the source reports m/s
-    - name: "Wind Avg (mph)"
-      unique_id: wind_avg_mph_view
-      unit_of_measurement: "mph"
-      device_class: wind_speed
-      state_class: measurement
-      state: >-
-        {% set v = states('sensor.weatherstation_wind_avg') | float(0) %}
-        {% set unit = state_attr('sensor.weatherstation_wind_avg','unit_of_measurement') | lower %}
-        {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
+      - name: "Rain Delta (in)"
+        unique_id: rain_delta_in
+        unit_of_measurement: "in"
+        device_class: precipitation
+        state_class: measurement
+        state: >-
+          {% set cur  = states('sensor.rain_cumulative_in') | float(0) %}
+          {% set prev = state_attr(this.entity_id, 'last_good') | float(0) %}
+          {% set d = cur - prev %}
+          {{ (d if d >= 0 and d < 3 else 0) | round(2) }}
+        attributes:
+          last_good: >-
+            {% set cur = states('sensor.rain_cumulative_in') | float(0) %}
+            {% set prev = this.attributes.last_good if 'last_good' in this.attributes else 0 %}
+            {% set prev_val = prev | float(0) %}
+            {{ cur if cur >= prev_val else prev_val }}
 
-    # Wind Max (mph), convert only if the source reports m/s
-    - name: "Wind Max (mph)"
-      unique_id: wind_max_mph_view
-      unit_of_measurement: "mph"
-      device_class: wind_speed
-      state_class: measurement
-      state: >-
-        {% set v = states('sensor.weatherstation_wind_max') | float(0) %}
-        {% set unit = state_attr('sensor.weatherstation_wind_max','unit_of_measurement') | lower %}
-        {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
+      # Wind Avg (mph), convert only if the source reports m/s
+      - name: "Wind Avg (mph)"
+        unique_id: wind_avg_mph_view
+        unit_of_measurement: "mph"
+        device_class: wind_speed
+        state_class: measurement
+        state: >-
+          {% set v = states('sensor.weatherstation_wind_avg') | float(0) %}
+          {% set unit = state_attr('sensor.weatherstation_wind_avg','unit_of_measurement') | lower %}
+          {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
 
+      # Wind Max (mph), convert only if the source reports m/s
+      - name: "Wind Max (mph)"
+        unique_id: wind_max_mph_view
+        unit_of_measurement: "mph"
+        device_class: wind_speed
+        state_class: measurement
+        state: >-
+          {% set v = states('sensor.weatherstation_wind_max') | float(0) %}
+          {% set unit = state_attr('sensor.weatherstation_wind_max','unit_of_measurement') | lower %}
+          {{ (v * 2.23694) if unit in ['m/s','mps','meter/second','metre/second','meters/second','metres/second','m s-1','m s^-1'] else v }}
+  - weather:
+      - name: "My Weather"
+        unique_id: 1d253178-64fe-4482-bc28-f1eae64079ba
+        condition_template: >-
+          {% set order = ['weather.tomorrow_io_daily','weather.nws','weather.home'] %}
+          {% for e in order %}
+            {% if states(e) not in ['unknown','unavailable',''] %}
+              {{ states(e) }}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+        temperature_template: "{{ states('sensor.weatherstation_temperature') | float(0) }}"
+        humidity_template: "{{ states('sensor.weatherstation_humidity') | float(0) }}"
+        pressure_template: "{{ (states('sensor.garage_pressure') | float(0)) | round(1) }}"
+        wind_speed_template: "{{ states('sensor.weatherstation_wind_avg') | float(0) }}"
+        wind_bearing_template: "{{ states('sensor.weatherstation_wind_direction') }}"
+        ozone_template: "{{ states('sensor.current_ozone_level') | float(0) }}"
+        visibility_template: >-
+          {% set order = ['weather.tomorrow_io_daily','weather.nws','weather.home'] %}
+          {% for e in order %}
+            {% if states(e) not in ['unknown','unavailable',''] %}
+              {{ state_attr(e, 'visibility') }}
+              {% break %}
+            {% endif %}
+          {% endfor %}
 
 ###############################################################################
 # Rolling 24-hour rain total (inches) from guarded per-event deltas
 ###############################################################################
 sensor:
   - platform: statistics
-    name: "Rain 24h"
-    unique_id: rain_24h_in
-    entity_id: sensor.rain_delta_in
-    state_characteristic: sum
+    name: "Rain 24h (rolling)"
+    unique_id: rain_24h_change
+    entity_id: sensor.rain_cumulative_in
+    state_characteristic: change
     max_age:
       hours: 24
     sampling_size: 2000
+    precision: 2
 
 ###############################################################################
 # Utility meters (inches) — daily & seasonal (reset Jul 1 at 00:00 local)
@@ -268,46 +328,48 @@ sensor:
 ###############################################################################
 utility_meter:
   rain_today:
-    source: sensor.weatherstation_rainfall_mm_latched
+    source: sensor.rain_cumulative_in
     cycle: daily
     delta_values: true
     periodically_resetting: true
+    unique_id: rain_today_in
 
   rain_season:
-    source: sensor.weatherstation_rainfall_mm_latched
-    cron: "0 0 1 7 *"   # reset July 1, 00:00
+    source: sensor.rain_cumulative_in
+    cron: "0 0 1 7 *" # reset July 1, 00:00
     delta_values: true
     periodically_resetting: true
+    unique_id: rain_season_in
 
 ###############################################################################
-# Weather template entity ("My Weather")
+# Weather template entity ("My Weather") --> Moved into template 25/12/03
 ###############################################################################
-weather:
-  - platform: template
-    name: "My Weather"
-    unique_id: 1d253178-64fe-4482-bc28-f1eae64079ba
-    condition_template: >-
-      {% set order = ['weather.tomorrow_io_daily','weather.nws','weather.home'] %}
-      {% for e in order %}
-        {% if states(e) not in ['unknown','unavailable',''] %}
-          {{ states(e) }}
-          {% break %}
-        {% endif %}
-      {% endfor %}
-    temperature_template: "{{ states('sensor.weatherstation_temperature') | float(0) }}"
-    humidity_template: "{{ states('sensor.weatherstation_humidity') | float(0) }}"
-    pressure_template: "{{ (states('sensor.garage_pressure') | float(0)) | round(1) }}"
-    wind_speed_template: "{{ states('sensor.weatherstation_wind_avg') | float(0) }}"
-    wind_bearing_template: "{{ states('sensor.weatherstation_wind_direction') }}"
-    ozone_template: "{{ states('sensor.current_ozone_level') | float(0) }}"
-    visibility_template: >-
-      {% set order = ['weather.tomorrow_io_daily','weather.nws','weather.home'] %}
-      {% for e in order %}
-        {% if states(e) not in ['unknown','unavailable',''] %}
-          {{ state_attr(e, 'visibility') }}
-          {% break %}
-        {% endif %}
-      {% endfor %}
+# weather:
+#   - platform: template
+#     name: "My Weather"
+#     unique_id: 1d253178-64fe-4482-bc28-f1eae64079ba
+#     condition_template: >-
+#       {% set order = ['weather.tomorrow_io_daily','weather.nws','weather.home'] %}
+#       {% for e in order %}
+#         {% if states(e) not in ['unknown','unavailable',''] %}
+#           {{ states(e) }}
+#           {% break %}
+#         {% endif %}
+#       {% endfor %}
+#     temperature_template: "{{ states('sensor.weatherstation_temperature') | float(0) }}"
+#     humidity_template: "{{ states('sensor.weatherstation_humidity') | float(0) }}"
+#     pressure_template: "{{ (states('sensor.garage_pressure') | float(0)) | round(1) }}"
+#     wind_speed_template: "{{ states('sensor.weatherstation_wind_avg') | float(0) }}"
+#     wind_bearing_template: "{{ states('sensor.weatherstation_wind_direction') }}"
+#     ozone_template: "{{ states('sensor.current_ozone_level') | float(0) }}"
+#     visibility_template: >-
+#       {% set order = ['weather.tomorrow_io_daily','weather.nws','weather.home'] %}
+#       {% for e in order %}
+#         {% if states(e) not in ['unknown','unavailable',''] %}
+#           {{ state_attr(e, 'visibility') }}
+#           {% break %}
+#         {% endif %}
+#       {% endfor %}
 
 ###############################################################################
 # Maintenance controls (UI toggle + stored baseline)
@@ -375,7 +437,7 @@ script:
       - variables:
           cum: "{{ states('sensor.rain_cumulative_in') | float(0) }}"
           base: "{{ states('input_number.rain_cum_baseline_in') | float(0) }}"
-          expected: "{{ (cum - base) | round(2) | float(0) | max(0) }}"
+          expected: "{{ [(cum - base) | round(2)] | max }}"
       - service: utility_meter.calibrate
         target:
           entity_id: sensor.rain_season

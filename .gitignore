@@ -5,6 +5,7 @@ secrets.yaml
 .google.token
 .spotify-token-cache
 .homekit.state
+.claude/
 
 # 🗃️ Runtime artifacts
 *.db
