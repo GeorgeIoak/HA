@@ -187,17 +187,19 @@
 - id: '1756326677921'
   alias: Republish Cotech WeatherStation Data
   description: Normalize Cotech sensor data to stable WeatherStation topic
-  triggers:
-  - topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/67/+/#
-    trigger: mqtt
-  actions:
-  - data:
-      topic: '{% set parts = trigger.topic.split(''/'') %} rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/{{
-        parts[-1] }}'
-      payload: '{{ trigger.payload }}'
-      qos: 0
-      retain: true
-    action: mqtt.publish
+  trigger:
+    - platform: mqtt
+      topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/+/+/#
+  condition: []
+  action:
+    - service: mqtt.publish
+      data:
+        topic: >-
+          {% set parts = trigger.topic.split('/') %}
+          rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/{{ parts[-1] }}
+        payload: '{{ trigger.payload }}'
+        qos: 0
+        retain: true
   mode: parallel
   max: 8
 - id: '1756771956576'

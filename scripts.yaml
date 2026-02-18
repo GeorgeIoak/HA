@@ -15,6 +15,26 @@ afs_30:
     service: homeassistant.turn_on
   - entity_id: input_boolean.timer_30min
     service: input_boolean.turn_off
+    sequence:
+    - service: input_boolean.toggle
+      target:
+        entity_id: input_boolean.timer_30min
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.timer_60min
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.timer_90min
+    - condition: state
+      entity_id: input_boolean.timer_30min
+      state: 'on'
+    - delay: 00:01:00
+    - service: homeassistant.turn_on
+      target:
+        entity_id: script.garage_afs_off
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.timer_30min
 activate_hue_dynamic_scene:
   alias: Activate Hue dynamic scene
   mode: restart
@@ -45,6 +65,25 @@ activate_hue_dynamic_scene:
         %} {{''scene.'' + select}}
 
         '
+    sequence:
+    - condition: '{{is_state(''binary_sensor.selected_hue_group_active_scene'',''off'')}}'
+    - service: scene.create
+      data:
+        scene_id: before_dynamic_scene
+        snapshot_entities:
+          - >-
+            {% set select = states('input_select.hue_group')|slugify %}
+            {% set group = 'light.' + select %}
+            {{ group }}
+    - service: hue.activate_scene
+      data:
+        dynamic: true
+        speed: '{{ states(''input_number.hue_dynamic_scene_speed'')|int }}'
+        brightness: '{{ states(''input_number.hue_dynamic_scene_brightness'')|int }}'
+      target:
+        entity_id: >-
+          {% set select = states('input_select.hue_dynamic_scene')|slugify %}
+          {{ 'scene.' + select }}
 deactivate_hue_dynamic_scene:
   alias: Deactivate Hue dynamic scene
   mode: restart
@@ -64,6 +103,18 @@ deactivate_hue_dynamic_scene:
   - service: scene.turn_on
     target:
       entity_id: scene.before_dynamic_scene
+    sequence:
+    - condition: '{{is_state(''binary_sensor.selected_hue_group_active_scene'',''on'')}}'
+    - service: hue.activate_scene
+      data:
+        dynamic: false
+      target:
+        entity_id: >-
+          {% set select = states('input_select.hue_dynamic_scene')|slugify %}
+          {{ 'scene.' + select }}
+    - service: scene.turn_on
+      target:
+        entity_id: scene.before_dynamic_scene
 opensprinkler_restore_back_yard_stage_1_differences_only:
   alias: OpenSprinkler Restore — Back Yard (from 8/28 backup)
   sequence:
@@ -138,6 +189,94 @@ opensprinkler_restore_back_yard_stage_1_differences_only:
       value: Back Yard
     action: text.set_value
   mode: single
+    sequence:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.back_yard_program_enabled
+    - service: switch.turn_on
+      target:
+        entity_id: switch.back_yard_program_program_use_weather
+    - service: select.select_option
+      target:
+        entity_id: select.back_yard_program_additional_start_time_type
+      data:
+        option: Repeating
+    - service: select.select_option
+      target:
+        entity_id: select.back_yard_program_restrictions
+      data:
+        option: None
+    - service: select.select_option
+      target:
+        entity_id: select.back_yard_program_start_time_offset_type
+      data:
+        option: Midnight
+    - service: select.select_option
+      target:
+        entity_id: select.back_yard_program_type
+      data:
+        option: Interval
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_backyard_left_station_duration
+      data:
+        value: 20
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_backyard_right_station_duration
+      data:
+        value: 5
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_front_left_station_duration
+      data:
+        value: 0
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_front_middle_station_duration
+      data:
+        value: 0
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_front_right_station_duration
+      data:
+        value: 0
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_interval_days
+      data:
+        value: 3
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_pond_station_duration
+      data:
+        value: 20
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_s07_station_duration
+      data:
+        value: 0
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_s08_station_duration
+      data:
+        value: 0
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_start_time_offset
+      data:
+        value: 1200
+    - service: number.set_value
+      target:
+        entity_id: number.back_yard_program_starting_in_days
+      data:
+        value: 0
+    - service: text.set_value
+      target:
+        entity_id: text.back_yard_program_program_name
+      data:
+        value: Back Yard
+    mode: single
 opensprinkler_restore_front_yard_from_8_28_backup:
   alias: OpenSprinkler Restore — Front Yard (from 8/28 backup)
   sequence:
@@ -213,6 +352,95 @@ opensprinkler_restore_front_yard_from_8_28_backup:
     action: text.set_value
   mode: single
   description: ''
+    sequence:
+    - service: switch.turn_on
+      target:
+        entity_id: switch.front_yard_program_enabled
+    - service: switch.turn_on
+      target:
+        entity_id: switch.front_yard_program_program_use_weather
+    - service: select.select_option
+      target:
+        entity_id: select.front_yard_program_additional_start_time_type
+      data:
+        option: Fixed
+    - service: select.select_option
+      target:
+        entity_id: select.front_yard_program_restrictions
+      data:
+        option: None
+    - service: select.select_option
+      target:
+        entity_id: select.front_yard_program_start_time_offset_type
+      data:
+        option: Midnight
+    - service: select.select_option
+      target:
+        entity_id: select.front_yard_program_type
+      data:
+        option: Interval
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_backyard_left_station_duration
+      data:
+        value: 0
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_backyard_right_station_duration
+      data:
+        value: 0
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_front_left_station_duration
+      data:
+        value: 60
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_front_middle_station_duration
+      data:
+        value: 60
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_front_right_station_duration
+      data:
+        value: 60
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_interval_days
+      data:
+        value: 3
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_pond_station_duration
+      data:
+        value: 0
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_s07_station_duration
+      data:
+        value: 0
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_s08_station_duration
+      data:
+        value: 0
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_start_time_offset
+      data:
+        value: 300
+    - service: number.set_value
+      target:
+        entity_id: number.front_yard_program_starting_in_days
+      data:
+        value: 0
+    - service: text.set_value
+      target:
+        entity_id: text.front_yard_program_program_name
+      data:
+        value: Front Yard
+    mode: single
+    description: ''
 
 reset_rain_meters:
   alias: Reset rain season & today to 0
@@ -224,3 +452,15 @@ reset_rain_meters:
       target: { entity_id: sensor.rain_today }
       data: { value: 0 }
   mode: single
+    sequence:
+      - service: utility_meter.calibrate
+        target:
+          entity_id: sensor.rain_season
+        data:
+          value: 0
+      - service: utility_meter.calibrate
+        target:
+          entity_id: sensor.rain_today
+        data:
+          value: 0
+    mode: single

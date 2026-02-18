@@ -3,12 +3,20 @@ default_config:
 mobile_app:
 # discovery: #Had to comment out because of update 8/6/23
 
+# Added 2026/01/10 for live-streaming Dahua/Amcrest cameras
+ffmpeg:
+
+python_script:
+
 logger:
   default: warning
   logs:
     # Silence ONVIF time-drift warnings, keep real errors
     homeassistant.components.onvif: error
     homeassistant.components.amcrest: error
+    # custom_components.eyeonwater: debug
+    # custom_components.eyeonwater.statistic_helper: debug
+    # pyonwater: debug
 
 # mqtt:
 #   broker: 192.168.10.201
@@ -36,9 +44,9 @@ tts:
 #     station: KSAC
 
 # Example configuration.yaml entry
-media_player:
-  - platform: pioneer
-    host: 192.168.10.20
+# media_player:
+#   - platform: pioneer
+#     host: 192.168.10.20
   # - platform: aarlo  # Commented 4/8/24 for v0.8
 
 group: !include groups.yaml
@@ -65,84 +73,6 @@ homeassistant:
     media: /media
     share: /share
 
-# Weather Template --> Moved to packages/weather.yaml
-# weather:
-#   - platform: template
-#     name: "My Weather"
-#     unique_id: 1d253178-64fe-4482-bc28-f1eae64079ba
-#     condition_template: "{{ states('weather.climacell_daily') }}"
-#     temperature_template: "{{ states('sensor.weatherstation_temperature') | float }}"
-#     humidity_template: "{{ states('sensor.weatherstation_humidity') | float }}"
-#     # forecast_template: "{{ state_attr('weather.climacell_daily', 'forecast') }}"
-#     pressure_template: "{{ (states('sensor.garage_pressure') | float) | round(1) }}"
-#     wind_speed_template: "{{ states('sensor.weatherstation_wind_average') | float }}"
-#     wind_bearing_template: "{{ states('sensor.weatherstation_wind_direction') }}"
-#     ozone_template: "{{ states('sensor.current_ozone_level') | float }}"
-#     visibility_template: "{{ state_attr('weather.climacell_daily', 'visibility') }}"
-
-# enable stream for video doorbell
-# stream:
-
-# aarlo:  # Commented out on 4/8/24 for v0.8
-#   host: https://my.arlo.com
-#   username: !secret arlo_username
-#   password: !secret arlo_password
-#   refresh_devices_every: 2
-#   stream_timeout: 120
-#   reconnect_every: 90
-
-#   tfa_source: imap
-#   tfa_type: email
-#   tfa_host: !secret tfa_host
-#   tfa_username: !secret tfa_username
-#   tfa_password: !secret tfa_password
-
-# camera:
-#   - platform: aarlo
-
-# binary_sensor:
-#   - platform: aarlo
-#     monitored_conditions:
-#       - motion
-#       - sound
-#       - ding
-#       - cry
-#       - connectivity
-
-# amcrest doorbell
-# amcrest:
-#   - host: 192.168.10.35
-#     name: "Driveway"
-#     username: !secret amcrest_doorbell_username
-#     password: !secret amcrest_doorbell_password
-#     stream_source: rtsp
-#     binary_sensors:
-#       - motion_detected
-#       - online
-#     sensors:
-#       - sdcard
-
-#   - host: 192.168.10.34
-#     name: "Stairs"
-#     username: !secret amcrest_doorbell_username
-#     password: !secret amcrest_doorbell_password
-#     stream_source: rtsp
-#     binary_sensors:
-#       - motion_detected
-#       - online
-#     sensors:
-#       - sdcard
-
-#   - host: 192.168.10.33
-#     name: "Doorbell"
-#     username: !secret amcrest_doorbell_username
-#     password: !secret amcrest_doorbell_password
-#     stream_source: rtsp
-#     binary_sensors:
-#       - motion_detected
-#       - online
-#     sensors:
-# #      - sdcard
 
 influxdb:
   host: a0d7b954-influxdb
