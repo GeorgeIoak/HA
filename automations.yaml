@@ -189,19 +189,66 @@
   description: Normalize Cotech sensor data to stable WeatherStation topic
   trigger:
     - platform: mqtt
-      topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/+/+/#
-  condition: []
+      topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/+
+  condition:
+    - condition: template
+      value_template: "{{ 'WeatherStation' not in trigger.topic }}"
   action:
     - service: mqtt.publish
       data:
-        topic: >-
-          {% set parts = trigger.topic.split('/') %}
-          rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/{{ parts[-1] }}
-        payload: '{{ trigger.payload }}'
+        topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/temperature_C
+        payload: "{{ trigger.payload_json.temperature_C }}"
         qos: 0
         retain: true
-  mode: parallel
-  max: 8
+    - service: mqtt.publish
+      data:
+        topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/humidity
+        payload: "{{ trigger.payload_json.humidity }}"
+        qos: 0
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/rain_mm
+        payload: "{{ trigger.payload_json.rain_mm }}"
+        qos: 0
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_dir_deg
+        payload: "{{ trigger.payload_json.wind_dir_deg }}"
+        qos: 0
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_avg_m_s
+        payload: "{{ trigger.payload_json.wind_avg_m_s }}"
+        qos: 0
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/wind_max_m_s
+        payload: "{{ trigger.payload_json.wind_max_m_s }}"
+        qos: 0
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/light_lux
+        payload: "{{ trigger.payload_json.light_lux }}"
+        qos: 0
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/uv
+        payload: "{{ trigger.payload_json.uv }}"
+        qos: 0
+        retain: true
+    - service: mqtt.publish
+      data:
+        topic: rtl_433/74930c0d-rtl433/devices/Cotech-367959/WeatherStation/battery_ok
+        payload: "{{ trigger.payload_json.battery_ok }}"
+        qos: 0
+        retain: true
+  mode: single
 - id: '1756771956576'
   alias: Doorbell Motion Announce (throttled)
   description: Announce motion at the door, but not within 2 minutes of a ring, and
